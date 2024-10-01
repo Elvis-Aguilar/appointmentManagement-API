@@ -1,0 +1,16 @@
+
+spring:
+# config profile active
+  profiles:
+    active: dev
+    
+  application:
+    name: appointmentManagement
+
+
+#config server    
+server:
+  servlet:
+    context-path: /appointment-management/api/v1
+    
+

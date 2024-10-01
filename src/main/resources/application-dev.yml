@@ -1,0 +1,26 @@
+# config dev
+
+spring:
+  datasource:
+    username: ${DB_USER}
+    password: ${DB_PASS}
+    url: jdbc:mysql://${DB_HOST}/${DB_DATABASE}
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+
+
+#config server    
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+

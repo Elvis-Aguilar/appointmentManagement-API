@@ -1,0 +1,5 @@
+# config production
+
+#config server    
+server:
+  port: 80
