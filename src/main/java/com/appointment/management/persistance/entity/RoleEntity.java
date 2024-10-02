@@ -3,6 +3,8 @@ package com.appointment.management.persistance.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "role")
 @Getter
@@ -21,4 +23,11 @@ public class RoleEntity {
     @NonNull
     @Column(nullable = false)
     private String description;
+
+
+    //realciones con tablas hijas
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    private List<UserEntity> users;
+
+
 }
