@@ -7,7 +7,6 @@ import lombok.*;
 @Table(name = "user_permission")
 @Getter
 @NoArgsConstructor
-@RequiredArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class UserPermissionEntity {
 
@@ -15,13 +14,12 @@ public class UserPermissionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
-    @NonNull
-    @Column(name = "permission_id", nullable = false)
-    private Long permissionId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "permission_id", nullable = false)
+    private PermissionEntity permission;
 
-    //mapear relacionde, tabla intermedia de muchos a muchos
 }

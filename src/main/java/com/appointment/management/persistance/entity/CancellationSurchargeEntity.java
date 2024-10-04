@@ -1,20 +1,20 @@
 package com.appointment.management.persistance.entity;
 
-import com.appointment.management.persistance.enums.StatusNotification;
+
+import com.appointment.management.persistance.enums.StatusCancellation;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "notification")
+@Table(name = "cancellation_surcharge")
 @Getter
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class NotificationEntity {
+public class CancellationSurchargeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,20 +22,25 @@ public class NotificationEntity {
 
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "appointment_id", nullable = false)
+    private AppointmentEntity appointment;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime date;
+
+    @NonNull
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private UserEntity customer;
 
     @NonNull
-    @Column(nullable = false)
-    private String description;
-
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private StatusNotification status;
+    private StatusCancellation status;
 
+    //manejo de relaciones con tablas hijas
+    @OneToOne(mappedBy = "cancellationSurcharge")
+    private InvoiceEntity invoice;
 
 }

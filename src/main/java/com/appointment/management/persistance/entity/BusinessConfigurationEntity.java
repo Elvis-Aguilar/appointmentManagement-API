@@ -1,9 +1,12 @@
 package com.appointment.management.persistance.entity;
 
+import com.appointment.management.persistance.enums.BusinessType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "user_permission")
@@ -11,7 +14,7 @@ import java.util.Date;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class BusinessConfiguration {
+public class BusinessConfigurationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,8 +29,9 @@ public class BusinessConfiguration {
     private String logoUrl;
 
     @NonNull
-    @Column(name = "admin_id", nullable = false)
-    private Long adminId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_id", nullable = false)
+    private UserEntity admin;
 
     @NonNull
     @Column(name = "created_at", nullable = false)
@@ -37,8 +41,10 @@ public class BusinessConfiguration {
     @Column(nullable = false)
     private String description;
 
-    //TODO: maped to enum
-
+    @NonNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "bussiness_type", nullable = false)
+    private BusinessType businessType;
 
     @NonNull
     @Column(name = "max_days_cancellation", nullable = false)
@@ -50,16 +56,14 @@ public class BusinessConfiguration {
 
     @NonNull
     @Column(name = "cancellation_surcharge", nullable = false)
-    private Double cancellationSurcharge; //verificacion de tipo de varable para decimales ver maximo de decimales
+    private BigDecimal cancellationSurcharge;
 
     @NonNull
     @Column(name = "max_days_update", nullable = false)
     private Integer maxDaysUpdate;
 
-    //TODO: maped to relation
-
-
-
-
+    //realciones con tablas hijas
+    @OneToMany(mappedBy = "business", fetch = FetchType.LAZY)
+    private List<BusinessHoursEntity> businessHours;
 
 }
