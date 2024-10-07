@@ -15,6 +15,18 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     open-in-view: false
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_ADDRESS}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 
 #config server    
 server:
@@ -22,5 +34,6 @@ server:
   error:
     include-message: always
     include-binding-errors: always
+
 
 
