@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "user_permission")
+@Table(name = "business_configuration")
 @Getter
 @NoArgsConstructor
 @RequiredArgsConstructor

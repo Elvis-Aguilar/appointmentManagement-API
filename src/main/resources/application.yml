@@ -13,4 +13,8 @@ server:
   servlet:
     context-path: /appointment-management/api/v1
     
-
+security:
+  jwt:
+    token:
+      secret-key: ${JWT_SECRET}
+      expiration-time-min: 1440
