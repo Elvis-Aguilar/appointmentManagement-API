@@ -1,8 +1,10 @@
 package com.appointment.management.application.config;
+
 import com.appointment.management.domain.service.UserService;
+import com.appointment.management.domain.service.auth.AuthenticationManagerService;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
-import lombok.Value;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,7 +36,6 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(GET, "/api/prueba-auth").authenticated()
                         .requestMatchers(GET, "/api/**").permitAll()
                         .requestMatchers(POST, "/api/**").permitAll()
                         .requestMatchers(PUT, "/api/**").permitAll()

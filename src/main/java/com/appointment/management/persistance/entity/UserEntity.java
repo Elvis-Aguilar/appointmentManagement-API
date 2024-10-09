@@ -6,10 +6,12 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "user")
 @Getter
+@Setter
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -43,7 +45,7 @@ public class UserEntity {
     private String phone;
 
     @NonNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     private RoleEntity role;
 
@@ -54,11 +56,14 @@ public class UserEntity {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    //relaciones con tablas hijas
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<UserPermissionEntity> userPermissions;
+    @Column(name = "google_auth_key")
+    private String googleAuthKey;
 
-    @OneToOne(mappedBy = "admin")
+    //relaciones con tablas hijas
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private Set<UserPermissionEntity> userPermissions;
+
+    @OneToOne(mappedBy = "admin",fetch = FetchType.LAZY)
     private BusinessConfigurationEntity businessConfiguration;
 
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)

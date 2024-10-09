@@ -25,8 +25,6 @@ public class PermissionEntity {
     @Column(nullable = false)
     private String description;
 
-    //manejo de relaciones con tablas hijas
-    @OneToMany(mappedBy = "permission", fetch = FetchType.LAZY)
-    private List<UserPermissionEntity> userPermissions;
+
 
 }

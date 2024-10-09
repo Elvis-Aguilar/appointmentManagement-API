@@ -1,6 +1,6 @@
 package com.appointment.management.application.config;
 
-import com.appointment.management.domain.service.TokenService;
+import com.appointment.management.domain.service.auth.TokenService;
 import com.appointment.management.persistance.entity.UserEntity;
 import com.appointment.management.persistance.repository.UserRepository;
 import jakarta.servlet.FilterChain;

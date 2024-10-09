@@ -6,6 +6,8 @@ import lombok.*;
 @Entity
 @Table(name = "user_permission")
 @Getter
+@Setter
+@RequiredArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class UserPermissionEntity {
@@ -14,11 +16,13 @@ public class UserPermissionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @NonNull
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @NonNull
+    @ManyToOne
     @JoinColumn(name = "permission_id", nullable = false)
     private PermissionEntity permission;
 
