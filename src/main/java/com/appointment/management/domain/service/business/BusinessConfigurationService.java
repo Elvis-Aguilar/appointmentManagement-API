@@ -23,7 +23,6 @@ public class BusinessConfigurationService {
     @Transactional
     public BusinessConfigurationDto save(BusinessConfigurationDto businessConfigurationDto) {
         BusinessConfigurationEntity businessConfigurationEntity = businessConfigurationMapper.toEntity(businessConfigurationDto);
-        System.out.println(businessConfigurationEntity.toString());
         BusinessConfigurationEntity savedEntity = businessConfigurationRepository.save(businessConfigurationEntity);
         return businessConfigurationMapper.toDto(savedEntity);
     }
@@ -32,7 +31,7 @@ public class BusinessConfigurationService {
     public BusinessConfigurationDto findById(Long id) {
         Optional<BusinessConfigurationEntity> businessConfig = businessConfigurationRepository.findById(id);
         return businessConfig.map(businessConfigurationMapper::toDto)
-                .orElseThrow(() -> new IllegalArgumentException("Business configuration not found with ID: " + id));
+                .orElseThrow(() -> new ValueNotFoundException("Business configuration not found with ID: " + id));
     }
 
 
@@ -44,6 +43,7 @@ public class BusinessConfigurationService {
         update.setId(id);
         // Guardamos los cambios
         BusinessConfigurationEntity updatedEntity = businessConfigurationRepository.save(update);
+        updatedEntity.setCreatedAt(existingEntity.getCreatedAt());
         return businessConfigurationMapper.toDto(updatedEntity);
     }
 

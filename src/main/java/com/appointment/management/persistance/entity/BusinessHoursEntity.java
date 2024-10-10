@@ -13,6 +13,7 @@ import java.time.LocalTime;
 @Entity
 @Table(name = "business_hours")
 @Getter
+@Setter
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -44,7 +45,7 @@ public class BusinessHoursEntity {
     private LocalTime closingTime;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)

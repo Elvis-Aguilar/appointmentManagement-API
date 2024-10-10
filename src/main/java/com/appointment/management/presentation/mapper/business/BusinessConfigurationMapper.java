@@ -10,12 +10,12 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", uses = UserMapperHelper.class)
 public interface BusinessConfigurationMapper {
 
+    @Mapping(target = "businessHours", ignore = true)
     @Mapping(target = "admin", source = "admin")
     @Mapping(target = "createdAt", ignore = true)
     BusinessConfigurationEntity toEntity(BusinessConfigurationDto dto);
 
     @InheritInverseConfiguration
     BusinessConfigurationDto toDto(BusinessConfigurationEntity entity);
-
 
 }

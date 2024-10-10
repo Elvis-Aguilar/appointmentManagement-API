@@ -2,6 +2,8 @@ package com.appointment.management.presentation.controller;
 
 import com.appointment.management.domain.dto.business.BusinessConfigurationDto;
 import com.appointment.management.domain.service.business.BusinessConfigurationService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/Business-Config")
+@RequestMapping("/business-config")
 public class BusinessConfigurationController {
 
     @Autowired
@@ -18,15 +20,16 @@ public class BusinessConfigurationController {
     // Crear una nueva configuración de negocio
     @PostMapping
     public ResponseEntity<BusinessConfigurationDto> createBusinessConfiguration(
-            @RequestBody BusinessConfigurationDto businessConfigurationDto) {
-        System.out.println(businessConfigurationDto.maxHoursUpdate());
+            @Valid @RequestBody BusinessConfigurationDto businessConfigurationDto) {
+
         BusinessConfigurationDto createdConfig = businessConfigurationService.save(businessConfigurationDto);
 
         return new ResponseEntity<>(createdConfig, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BusinessConfigurationDto> getBusinessConfigurationById(@PathVariable Long id) {
+    public ResponseEntity<BusinessConfigurationDto> getBusinessConfigurationById(
+            @Valid @PathVariable @Positive Long id) {
 
         BusinessConfigurationDto businessConfiguration = businessConfigurationService.findById(id);
 
@@ -35,8 +38,8 @@ public class BusinessConfigurationController {
 
     @PutMapping("/{id}")
     public ResponseEntity<BusinessConfigurationDto> updateBusinessConfiguration(
-            @PathVariable Long id,
-            @RequestBody BusinessConfigurationDto businessConfigurationDto) {
+            @Valid @PathVariable @Positive Long id,
+            @Valid @RequestBody BusinessConfigurationDto businessConfigurationDto) {
 
         BusinessConfigurationDto updatedConfig = businessConfigurationService.update(id, businessConfigurationDto);
 
