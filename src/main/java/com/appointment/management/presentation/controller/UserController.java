@@ -13,12 +13,10 @@ import com.appointment.management.domain.service.auth.GoogleAuthService;
 import com.appointment.management.domain.service.auth.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {

@@ -3,14 +3,18 @@ package com.appointment.management.persistance.entity;
 import com.appointment.management.persistance.enums.BusinessType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "business_configuration")
 @Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -33,9 +37,9 @@ public class BusinessConfigurationEntity {
     @JoinColumn(name = "admin_id", nullable = false)
     private UserEntity admin;
 
-    @NonNull
-    @Column(name = "created_at", nullable = false)
-    private Date createdAt;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     @NonNull
     @Column(nullable = false)
@@ -61,6 +65,10 @@ public class BusinessConfigurationEntity {
     @NonNull
     @Column(name = "max_days_update", nullable = false)
     private Integer maxDaysUpdate;
+
+    @NonNull
+    @Column(name = "max_hours_update", nullable = false)
+    private BigDecimal maxHoursUpdate;
 
     //realciones con tablas hijas
     @OneToMany(mappedBy = "business", fetch = FetchType.LAZY)

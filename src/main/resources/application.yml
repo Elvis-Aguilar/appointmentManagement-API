@@ -7,6 +7,11 @@ spring:
   application:
     name: appointmentManagement
 
+  servlet:
+    multipart:
+      max-file-size: 5MB    # Tamaño máximo permitido para un archivo
+      max-request-size: 5MB # Tamaño máximo permitido para toda la solicitud (puede incluir múltiples archivos)
+
 
 #config server    
 server:
@@ -18,3 +23,10 @@ security:
     token:
       secret-key: ${JWT_SECRET}
       expiration-time-min: 1440
+
+
+cloudinary:
+  cloudName: ${CLOUDINARY_CLOUD_NAME}
+  apiKey: ${CLOUDINARY_API_KEY}
+  apiSecret: ${CLOUDINARY_API_SECRET}
+
