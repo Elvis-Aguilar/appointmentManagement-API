@@ -56,8 +56,6 @@ public class UserController {
     public ResponseEntity<UserDto> addMultiFactorAuthentication(@NonNull HttpServletRequest request,
                                                                 @RequestBody GoogleAuthKeyDto googleKey) {
         long id = tokenService.getIdFromToken(request);
-        System.out.println(id);
-        System.out.println(googleKey);
         if (!googleAuthService.authencateUserWithGoogleAuth(googleKey.authKey(), googleKey.code())) {
             throw new BadRequestException("El codigo no es valido");
         }
