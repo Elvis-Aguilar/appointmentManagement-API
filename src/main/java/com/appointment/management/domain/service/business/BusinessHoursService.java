@@ -7,6 +7,7 @@ import com.appointment.management.persistance.repository.BusinessHoursRepository
 import com.appointment.management.presentation.mapper.business.BusinessHoursMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,18 +25,21 @@ public class BusinessHoursService {
         this.businessHoursMapper = businessHoursMapper;
     }
 
+    @Transactional
     public BusinessHoursDto create(BusinessHoursDto dto) {
         BusinessHoursEntity entity = businessHoursMapper.toEntity(dto);
         BusinessHoursEntity savedEntity = businessHoursRepository.save(entity);
         return businessHoursMapper.toDto(savedEntity);
     }
 
+    @Transactional(readOnly = true)
     public BusinessHoursDto getById(Long id) {
         BusinessHoursEntity entity = businessHoursRepository.findById(id)
                 .orElseThrow(() -> new ValueNotFoundException("BusinessHours not found with id: " + id));
         return businessHoursMapper.toDto(entity);
     }
 
+    @Transactional
     public BusinessHoursDto update(Long id, BusinessHoursDto dto) {
         BusinessHoursEntity existingEntity = businessHoursRepository.findById(id)
                 .orElseThrow(() -> new ValueNotFoundException("BusinessHours not found with id: " + id));
@@ -47,12 +51,14 @@ public class BusinessHoursService {
         return businessHoursMapper.toDto(updatedEntity);
     }
 
+    @Transactional
     public void delete(Long id) {
         BusinessHoursEntity entity = businessHoursRepository.findById(id)
                 .orElseThrow(() -> new ValueNotFoundException("BusinessHours not found with id: " + id));
         businessHoursRepository.delete(entity);
     }
 
+    @Transactional(readOnly = true)
     public List<BusinessHoursDto> getAll() {
         List<BusinessHoursEntity> entities = businessHoursRepository.findAll();
         return entities.stream()
@@ -60,6 +66,7 @@ public class BusinessHoursService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<BusinessHoursDto> getAllWithNullSpecificDateIs() {
         List<BusinessHoursEntity> entities = businessHoursRepository.findBySpecificDateIsNull();
         return entities.stream()
@@ -67,6 +74,7 @@ public class BusinessHoursService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<BusinessHoursDto> getBusinessHoursInDateRange(LocalDate startDate, LocalDate endDate) {
         List<BusinessHoursEntity> entities = businessHoursRepository.findBySpecificDateBetween(startDate, endDate);
         return entities.stream()

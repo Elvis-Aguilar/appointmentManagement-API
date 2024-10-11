@@ -10,6 +10,8 @@ import java.util.List;
 @Entity
 @Table(name = "service")
 @Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(of = "id")
