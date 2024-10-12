@@ -1,8 +1,12 @@
 package com.appointment.management.domain.service.business;
 
+import com.appointment.management.application.exception.BadRequestException;
+import com.appointment.management.application.exception.ResourceNotFoundException;
 import com.appointment.management.application.exception.ValueNotFoundException;
 import com.appointment.management.domain.dto.business.ServiceDto;
 import com.appointment.management.persistance.entity.ServiceEntity;
+import com.appointment.management.persistance.enums.DayOfWeek;
+import com.appointment.management.persistance.enums.StatusBusinessHours;
 import com.appointment.management.persistance.repository.ServiceRepository;
 import com.appointment.management.presentation.mapper.business.ServiceMapper;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +23,24 @@ public class ServiceService {
     private final ServiceRepository serviceRepository;
     private final ServiceMapper serviceMapper;
 
+
     @Transactional(readOnly = true)
     public List<ServiceDto> getAllServices() {
         return serviceRepository.findAll().stream()
+                .map(serviceMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ServiceDto> getAllServicesAvailable() {
+        return serviceRepository.findAllByStatus(StatusBusinessHours.AVAILABLE).stream()
+                .map(serviceMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ServiceDto> getAllServicesUnavailable() {
+        return serviceRepository.findAllByStatus(StatusBusinessHours.UNAVAILABLE).stream()
                 .map(serviceMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -51,10 +70,28 @@ public class ServiceService {
     }
 
     @Transactional
-    public void deleteService(Long id) {
-        if (!serviceRepository.existsById(id)) {
-            throw new ValueNotFoundException("Service not found with id: " + id);
+    public ServiceDto updateServiceStatus(Long id, String status) {
+        ServiceEntity entity = serviceRepository.findById(id)
+                .orElseThrow(() -> new ValueNotFoundException("Service not found with id: " + id));
+
+        StatusBusinessHours validStatus;
+        try {
+            validStatus = Enum.valueOf(StatusBusinessHours.class, status);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid status value: " + status);
         }
-        serviceRepository.deleteById(id);
+
+        entity.setStatus(validStatus);
+        ServiceEntity updatedEntity = serviceRepository.save(entity);
+        return serviceMapper.toDto(updatedEntity);
+    }
+
+
+    @Transactional
+    public void deleteService(Long id) {
+        ServiceEntity service = serviceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Service not found with id: " + id));
+        service.softDelete();
+        serviceRepository.save(service);
     }
 }

@@ -2,6 +2,7 @@ package com.appointment.management.presentation.controller;
 
 import com.appointment.management.domain.dto.business.ServiceDto;
 import com.appointment.management.domain.service.business.ServiceService;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,18 @@ public class ServiceController {
         return ResponseEntity.ok(services);
     }
 
+    @GetMapping("/available")
+    public ResponseEntity<List<ServiceDto>> getAvailableServices() {
+        List<ServiceDto> services = serviceService.getAllServicesAvailable();
+        return ResponseEntity.ok(services);
+    }
+
+    @GetMapping("/unavailable")
+    public ResponseEntity<List<ServiceDto>> getUnavailableServices() {
+        List<ServiceDto> services = serviceService.getAllServicesUnavailable();
+        return ResponseEntity.ok(services);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ServiceDto> getServiceById(@PathVariable Long id) {
         ServiceDto serviceDto = serviceService.getServiceById(id);
@@ -38,6 +51,12 @@ public class ServiceController {
     @PutMapping("/{id}")
     public ResponseEntity<ServiceDto> updateService(@PathVariable Long id, @Valid @RequestBody ServiceDto serviceDto) {
         ServiceDto updatedService = serviceService.updateService(id, serviceDto);
+        return ResponseEntity.ok(updatedService);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ServiceDto> updateServiceStatus(@PathVariable Long id, @RequestBody String status) {
+        ServiceDto updatedService = serviceService.updateServiceStatus(id, status);
         return ResponseEntity.ok(updatedService);
     }
 
