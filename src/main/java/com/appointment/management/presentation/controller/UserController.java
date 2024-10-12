@@ -13,12 +13,10 @@ import com.appointment.management.domain.service.auth.GoogleAuthService;
 import com.appointment.management.domain.service.auth.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -58,8 +56,6 @@ public class UserController {
     public ResponseEntity<UserDto> addMultiFactorAuthentication(@NonNull HttpServletRequest request,
                                                                 @RequestBody GoogleAuthKeyDto googleKey) {
         long id = tokenService.getIdFromToken(request);
-        System.out.println(id);
-        System.out.println(googleKey);
         if (!googleAuthService.authencateUserWithGoogleAuth(googleKey.authKey(), googleKey.code())) {
             throw new BadRequestException("El codigo no es valido");
         }

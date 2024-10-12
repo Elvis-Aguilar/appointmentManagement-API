@@ -1,5 +1,6 @@
 package com.appointment.management.persistance.entity;
 
+import com.appointment.management.persistance.enums.StatusBusinessHours;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,6 +11,8 @@ import java.util.List;
 @Entity
 @Table(name = "service")
 @Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -43,9 +46,18 @@ public class ServiceEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusBusinessHours status = StatusBusinessHours.AVAILABLE; //para el estado
+
     //manejo de relaciones con tablas hijas
     @OneToMany(mappedBy = "service", fetch = FetchType.LAZY)
     private List<AppointmentEntity> appointments;
 
+
+    // Método para marcar como eliminado
+    public void softDelete() {
+        this.status = StatusBusinessHours.DELETED;
+    }
 
 }

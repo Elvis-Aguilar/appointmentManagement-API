@@ -71,8 +71,8 @@ public class AuthController {
         String confirmationHtml = templateRendererService.renderTemplate("sign-up-confirmation", templateVariables);
 
         try {
-            emailService.sendHtmlEmail("Cloudmerce", dbUser.email(),
-                    "Confirmacion de usuario en Cloudmerce", confirmationHtml);
+            emailService.sendHtmlEmail("Appointment Management", dbUser.email(),
+                    "Confirmacion de usuario en Appointment Management", confirmationHtml);
         } catch (MessagingException e) {
             throw new RequestConflictException("No se pudo enviar el correo de confirmacion");
         }
@@ -134,7 +134,7 @@ public class AuthController {
         String confirmationHtml = templateRendererService.renderTemplate("recover-password", templateVariables);
 
         try {
-            emailService.sendHtmlEmail("Cloudmerce", dbUser.email(), "Recuperacion de contraseña en Cloudmerce",
+            emailService.sendHtmlEmail("Appointment Management", dbUser.email(), "Recuperacion de contraseña en Cloudmerce",
                     confirmationHtml);
         } catch (MessagingException e) {
             throw new RequestConflictException("No se pudo enviar el correo para la recuperacion de contraseña");
