@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/business-hours")
+@RequestMapping("/business/hours")
 public class BusinessHoursController {
 
     private final BusinessHoursService businessHoursService;
@@ -26,6 +26,12 @@ public class BusinessHoursController {
     @PostMapping
     public ResponseEntity<BusinessHoursDto> createBusinessHours(@Valid @RequestBody BusinessHoursDto dto) {
         BusinessHoursDto created = businessHoursService.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @PostMapping("/weeks-day")
+    public ResponseEntity<List<BusinessHoursDto>> createBusinessHoursGeneral(@Valid @RequestBody List<BusinessHoursDto> dtos) {
+        List<BusinessHoursDto> created = businessHoursService.createAllList(dtos);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 

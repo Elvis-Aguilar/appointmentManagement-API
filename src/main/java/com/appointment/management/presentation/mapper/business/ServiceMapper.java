@@ -11,6 +11,7 @@ import org.mapstruct.MappingTarget;
 public interface ServiceMapper {
 
     @Mapping(target = "appointments", ignore = true)
+    @Mapping(target = "status", ignore = true)
     ServiceEntity toEntity(ServiceDto dto);
 
     @InheritInverseConfiguration(name = "toEntity")
