@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/business-config")
+@RequestMapping("/business/config")
 public class BusinessConfigurationController {
 
     @Autowired

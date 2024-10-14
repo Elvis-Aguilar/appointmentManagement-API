@@ -15,6 +15,7 @@ public record ServiceDto(
         @NotBlank String description,
         Integer peopleReaches,
         String location,
-        String imageUrl
+        String imageUrl,
+        String status
 ) {
 }

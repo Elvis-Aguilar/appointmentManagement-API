@@ -11,6 +11,7 @@ import java.time.LocalTime;
 @Entity
 @Table(name = "employee_availability")
 @Getter
+@Setter
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -41,9 +42,5 @@ public class EmployeeAvailabilityEntity {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-    //TODO: mepd to enum day of week
 
-    //TODO: variales de timepo y fecha
-
-    //realtion of employye
 }

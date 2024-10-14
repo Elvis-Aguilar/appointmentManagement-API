@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public record BusinessHoursDto(
-        Long id,
+        @Positive Long id,
         @NonNull @Positive Long business,
         @NotBlank String dayOfWeek,
         LocalDate specificDate,
