@@ -27,10 +27,21 @@ public class BusinessHoursService {
 
     @Transactional
     public BusinessHoursDto create(BusinessHoursDto dto) {
-        BusinessHoursEntity entity = businessHoursMapper.toEntity(dto);
-        BusinessHoursEntity savedEntity = businessHoursRepository.save(entity);
-        return businessHoursMapper.toDto(savedEntity);
+        BusinessHoursEntity entity = this.businessHoursMapper.toEntity(dto);
+        BusinessHoursEntity savedEntity = this.businessHoursRepository.save(entity);
+        return this.businessHoursMapper.toDto(savedEntity);
     }
+
+    @Transactional
+    public List<BusinessHoursDto> createAllList(List<BusinessHoursDto> dtoList) {
+        List<BusinessHoursEntity> entities = dtoList.stream().map(this.businessHoursMapper::toEntity).toList();
+         return this.businessHoursRepository
+                 .saveAll(entities)
+                 .stream()
+                 .map(businessHoursMapper::toDto)
+                 .collect(Collectors.toList());
+    }
+
 
     @Transactional(readOnly = true)
     public BusinessHoursDto getById(Long id) {

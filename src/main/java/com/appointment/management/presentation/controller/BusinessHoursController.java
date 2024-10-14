@@ -29,6 +29,12 @@ public class BusinessHoursController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+    @PostMapping("general")
+    public ResponseEntity<List<BusinessHoursDto>> createBusinessHours(@Valid @RequestBody List<BusinessHoursDto> dtos) {
+        List<BusinessHoursDto> created = businessHoursService.createAllList(dtos);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<BusinessHoursDto> getBusinessHours(@Valid @PathVariable @Positive Long id) {
         BusinessHoursDto businessHours = businessHoursService.getById(id);
