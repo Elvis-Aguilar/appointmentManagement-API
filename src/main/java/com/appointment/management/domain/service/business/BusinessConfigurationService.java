@@ -47,5 +47,4 @@ public class BusinessConfigurationService {
         return businessConfigurationMapper.toDto(updatedEntity);
     }
 
-
 }
