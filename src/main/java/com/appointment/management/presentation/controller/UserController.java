@@ -7,12 +7,17 @@ import com.appointment.management.domain.dto.auth.GoogleAuthDto;
 import com.appointment.management.domain.dto.auth.GoogleAuthKeyDto;
 import com.appointment.management.domain.dto.auth.TokenDto;
 import com.appointment.management.domain.dto.auth.UserWithGoogleSecretDto;
+import com.appointment.management.domain.dto.user.PasswordChangeDto;
+import com.appointment.management.domain.dto.user.UserChangeDto;
 import com.appointment.management.domain.dto.user.UserDto;
+import com.appointment.management.domain.dto.user.UserProfileDto;
 import com.appointment.management.domain.service.UserService;
 import com.appointment.management.domain.service.auth.GoogleAuthService;
 import com.appointment.management.domain.service.auth.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.NonNull;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,5 +68,39 @@ public class UserController {
 
         return ResponseEntity.ok(user);
     }
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> getMyInformation(@NonNull HttpServletRequest request) {
+        long id = tokenService.getIdFromToken(request);
+        return ResponseEntity.of(userService.findUserById(id));
+    }
+
+    @PutMapping
+    public ResponseEntity<TokenDto> changePassword(@NonNull HttpServletRequest request,
+                                                       @RequestBody @Valid UserChangeDto user) {
+        long id = tokenService.getIdFromToken(request);
+        boolean temporal = tokenService.isTemporalToken(request);
+
+        UserWithGoogleSecretDto dbUser = userService.changeUserInfo(id, user, temporal);
+
+        return ResponseEntity.ok(addTokenToUserData(dbUser));
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<TokenDto> changePassword(@NonNull HttpServletRequest request,
+                                                   @RequestBody @Valid PasswordChangeDto user) {
+        long id = tokenService.getIdFromToken(request);
+
+        UserWithGoogleSecretDto dbUser = userService.changeUserPassword(id, user.password(), user.repeatedPassword());
+
+        return ResponseEntity.ok(addTokenToUserData(dbUser));
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<UserDto> updateUser(@NonNull HttpServletRequest request, @RequestBody @Valid UserProfileDto user) {
+        long id = tokenService.getIdFromToken(request);
+        UserDto userUpdate = this.userService.updateUser(id, user);
+        return ResponseEntity.ok(userUpdate);
+    }
+
 
 }
