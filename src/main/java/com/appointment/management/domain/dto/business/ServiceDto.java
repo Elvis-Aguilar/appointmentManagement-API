@@ -13,7 +13,7 @@ public record ServiceDto(
         @NonNull @PositiveOrZero BigDecimal price,
         @NonNull LocalTime duration,
         @NotBlank String description,
-        Integer peopleReaches,
+        @PositiveOrZero Integer peopleReaches,
         String location,
         String imageUrl,
         String status

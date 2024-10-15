@@ -55,7 +55,6 @@ public class ServiceService {
     @Transactional
     public ServiceDto createService(ServiceDto serviceDto) {
         ServiceEntity entity = serviceMapper.toEntity(serviceDto);
-        System.out.println(entity.toString());
         ServiceEntity savedEntity = serviceRepository.save(entity);
         return serviceMapper.toDto(savedEntity);
     }
