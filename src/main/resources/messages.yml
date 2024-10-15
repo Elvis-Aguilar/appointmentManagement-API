@@ -1,0 +1,11 @@
+javax:
+  validation:
+    constraints:
+      NotNull:
+        message: "El valor del campo {0} no puede ser nulo"
+      NotBlank:
+        message: "El valor del campo {0} no puede estar vacío"
+      Positive:
+        message: "El valor del campo {0} debe ser positivo"
+      PositiveOrZero:
+        message: "El valor del campo {0} debe ser positivo o cero"

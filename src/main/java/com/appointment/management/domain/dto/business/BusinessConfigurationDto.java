@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record BusinessConfigurationDto(
-        Long id,
+        @Positive Long id,
         @NotBlank String name,
         @NotBlank String logoUrl,
         @NonNull @Positive Long admin,
