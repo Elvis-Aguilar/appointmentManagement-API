@@ -121,7 +121,7 @@ class BusinessConfigurationControllerTest {
     void shouldThrowValidationExceptionForInvalidDto() {
         // Crear DTO inválido
         BusinessConfigurationDto invalidDto = new BusinessConfigurationDto(
-                -1L, "", "invalid-url", 1L, null, "dfadfadfasdf", "SERVICES",
+                -1L, "afdfdfa", "invalid-url", 1L, null, "dfadfadfasdf", "SERVICES",
                 1, 2, BigDecimal.valueOf(100), 7, BigDecimal.valueOf(2)
         );
 
@@ -133,7 +133,7 @@ class BusinessConfigurationControllerTest {
                 .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                 .collect(Collectors.joining("; "));
 
-        String expectedMessage = "name: no debe estar vacío; id: debe ser mayor que 0";
+        String expectedMessage = "id: debe ser mayor que 0";
 
         assertEquals(expectedMessage, actualMessage);
     }

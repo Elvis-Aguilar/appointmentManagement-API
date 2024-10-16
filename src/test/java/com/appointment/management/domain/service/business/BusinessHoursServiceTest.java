@@ -88,6 +88,19 @@ class BusinessHoursServiceTest {
     }
 
     @Test
+    void shouldReturnBusinessConfigurationHoursWhenIdExists() {
+        Long id = 1L;
+
+        when(businessHoursRepository.findById(id)).thenReturn(Optional.of(businessHoursEntity));
+        when(businessHoursMapper.toDto(businessHoursEntity)).thenReturn(businessHoursDto);
+
+        BusinessHoursDto result = businessHoursService.getById(id);
+
+        assertNotNull(result);
+        assertEquals(businessHoursDto.id(), result.id());
+    }
+
+    @Test
     void testUpdateBusinessHours() {
         Long id = 1L;
         when(businessHoursRepository.findById(id)).thenReturn(Optional.of(businessHoursEntity));
@@ -102,6 +115,21 @@ class BusinessHoursServiceTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenUpdateBusinessHoursNotFount() {
+        Long id = 1999L;
+        when(businessHoursRepository.findById(id)).thenReturn(Optional.empty());
+
+        ValueNotFoundException thrown = assertThrows(
+                ValueNotFoundException.class,
+                () -> businessHoursService.update(id, this.businessHoursDto),
+                "Expected findById() to throw, but it didn't"
+        );
+
+        assertTrue(thrown.getMessage().contains("BusinessHours not found with id: " + id));
+
+    }
+
+    @Test
     void testDeleteBusinessHours() {
         Long id = 1L;
         when(businessHoursRepository.findById(id)).thenReturn(Optional.of(businessHoursEntity));
@@ -109,6 +137,21 @@ class BusinessHoursServiceTest {
         businessHoursService.delete(id);
 
         verify(businessHoursRepository, times(1)).delete(businessHoursEntity);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDeleteBusinessHoursNotFount() {
+        Long id = 1999L;
+        when(businessHoursRepository.findById(id)).thenReturn(Optional.empty());
+
+        ValueNotFoundException thrown = assertThrows(
+                ValueNotFoundException.class,
+                () -> businessHoursService.delete(id),
+                "Expected findById() to throw, but it didn't"
+        );
+
+        assertTrue(thrown.getMessage().contains("BusinessHours not found with id: " + id));
+
     }
 
     @Test
@@ -149,5 +192,88 @@ class BusinessHoursServiceTest {
         assertNotNull(result);
         assertEquals(1, result.size());
         verify(businessHoursRepository, times(1)).findBySpecificDateBetween(startDate, endDate);
+    }
+
+    @Test
+    void shouldCreateAllBusinessHours() {
+        List<BusinessHoursDto> dtoList = List.of(businessHoursDto);
+        List<BusinessHoursEntity> entityList = List.of(businessHoursEntity);
+
+        when(businessHoursMapper.toEntity(any(BusinessHoursDto.class))).thenReturn(businessHoursEntity);
+
+        when(businessHoursRepository.saveAll(anyList())).thenReturn(entityList);
+
+        when(businessHoursMapper.toDto(any(BusinessHoursEntity.class))).thenReturn(businessHoursDto);
+
+        List<BusinessHoursDto> result = businessHoursService.createAllList(dtoList);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(businessHoursDto, result.getFirst());
+
+        // Verificar que los métodos del mapper y repositorio fueron llamados
+        verify(businessHoursMapper, times(1)).toEntity(businessHoursDto);
+        verify(businessHoursRepository, times(1)).saveAll(anyList());
+        verify(businessHoursMapper, times(1)).toDto(businessHoursEntity);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenInputIsEmpty() {
+        List<BusinessHoursDto> emptyDtoList = List.of();
+
+        List<BusinessHoursDto> result = businessHoursService.createAllList(emptyDtoList);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(businessHoursMapper, never()).toEntity(any());
+        verify(businessHoursRepository, never()).saveAll(anyList());
+        verify(businessHoursMapper, never()).toDto(any());
+    }
+
+    @Test
+    void shouldHandleMultipleBusinessHoursDtos() {
+        // Arrange
+        BusinessHoursDto businessHoursDto2 = new BusinessHoursDto(
+                2L,
+                2L,
+                "TUESDAY",
+                null,
+                LocalTime.of(10, 0),
+                LocalTime.of(18, 0),
+                null,
+                "AVAILABLE",
+                4,
+                3
+        );
+
+        BusinessHoursEntity businessHoursEntity2 = new BusinessHoursEntity();
+        businessHoursEntity2.setId(2L);
+        businessHoursEntity2.setOpeningTime(LocalTime.of(10, 0));
+        businessHoursEntity2.setClosingTime(LocalTime.of(18, 0));
+        businessHoursEntity2.setAvailableWorkers(4);
+        businessHoursEntity2.setAvailableAreas(3);
+
+        List<BusinessHoursDto> dtoList = List.of(businessHoursDto, businessHoursDto2);
+        List<BusinessHoursEntity> entityList = List.of(businessHoursEntity, businessHoursEntity2);
+
+        when(businessHoursMapper.toEntity(any(BusinessHoursDto.class)))
+                .thenReturn(businessHoursEntity)
+                .thenReturn(businessHoursEntity2);
+        when(businessHoursRepository.saveAll(anyList())).thenReturn(entityList);
+        when(businessHoursMapper.toDto(any(BusinessHoursEntity.class)))
+                .thenReturn(businessHoursDto)
+                .thenReturn(businessHoursDto2);
+
+        List<BusinessHoursDto> result = businessHoursService.createAllList(dtoList);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals(businessHoursDto, result.get(0));
+        assertEquals(businessHoursDto2, result.get(1));
+
+        verify(businessHoursMapper, times(2)).toEntity(any(BusinessHoursDto.class));
+        verify(businessHoursRepository, times(1)).saveAll(anyList());
+        verify(businessHoursMapper, times(2)).toDto(any(BusinessHoursEntity.class));
     }
 }

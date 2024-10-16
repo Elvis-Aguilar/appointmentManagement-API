@@ -97,7 +97,7 @@ class BusinessConfigurationServiceTest {
 
     @DisplayName("Dato un id"+"Cuando lo buscamos"+ "se espera la configuracion correcta")
     @Test
-    public void shouldReturnBusinessConfigurationWhenIdExists() {
+    void shouldReturnBusinessConfigurationWhenIdExists() {
         Long id = 1L;
 
         when(businessConfigurationRepository.findById(id)).thenReturn(Optional.of(this.businessConfigurationEntity));
@@ -111,7 +111,7 @@ class BusinessConfigurationServiceTest {
 
     @DisplayName("Dato un id inexistente"+"Cuando lo buscamos"+ "se espera una excepcion de ValueNotFoundException")
     @Test
-    public void shouldThrowExceptionWhenBusinessConfigurationNotFound() {
+    void shouldThrowExceptionWhenBusinessConfigurationNotFound() {
 
         Long id = 999L;
 
@@ -128,7 +128,7 @@ class BusinessConfigurationServiceTest {
 
     @DisplayName("Dato un id y cambio de configuraciones"+"Cuando modificamos"+ "se espera que se actulize la configuracioens correctamente")
     @Test
-    public void shouldUpdateBusinessConfiguration() {
+    void shouldUpdateBusinessConfiguration() {
         // Dado
         Long id = 1L;
 
@@ -147,5 +147,20 @@ class BusinessConfigurationServiceTest {
         assertEquals(this.businessConfigurationDto.name(), result.name());
     }
 
+    @DisplayName("Dato un id invalido y cambio de configuraciones"+"Cuando modificamos"+ "da una excepcion ValueNotFoundException")
+    @Test
+    void shouldThrowExceptionWhenUpdateBusinessConfigurationNotFount() {
+        // Dado
+        Long id = 1999L;
+
+        when(businessConfigurationRepository.findById(id)).thenReturn(Optional.empty());
+
+        ValueNotFoundException thrown = assertThrows(
+                ValueNotFoundException.class,
+                () -> businessConfigurationService.update(id, this.businessConfigurationDto),
+                "Expected findById() to throw, but it didn't"
+        );
+        assertTrue(thrown.getMessage().contains("Configuracion del negocio no encontradas con el Id: " + id));
+    }
 
 }

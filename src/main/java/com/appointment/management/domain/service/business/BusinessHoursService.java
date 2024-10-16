@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,9 @@ public class BusinessHoursService {
 
     @Transactional
     public List<BusinessHoursDto> createAllList(List<BusinessHoursDto> dtoList) {
+        if (dtoList.isEmpty()){
+            return List.of();
+        }
         List<BusinessHoursEntity> entities = dtoList.stream().map(this.businessHoursMapper::toEntity).toList();
          return this.businessHoursRepository
                  .saveAll(entities)
