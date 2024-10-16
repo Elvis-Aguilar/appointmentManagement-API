@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -22,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
 
-@SpringBootTest
 class BusinessConfigurationServiceTest {
 
     @Mock
@@ -117,7 +115,7 @@ class BusinessConfigurationServiceTest {
 
         Long id = 999L;
 
-        Mockito.when(businessConfigurationRepository.findById(id)).thenReturn(Optional.empty());
+        when(businessConfigurationRepository.findById(id)).thenReturn(Optional.empty());
 
         ValueNotFoundException thrown = assertThrows(
                 ValueNotFoundException.class,

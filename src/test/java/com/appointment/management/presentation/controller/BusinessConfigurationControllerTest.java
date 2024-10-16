@@ -133,7 +133,7 @@ class BusinessConfigurationControllerTest {
                 .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                 .collect(Collectors.joining("; "));
 
-        String expectedMessage = "id: debe ser mayor que 0; name: no debe estar vacío";
+        String expectedMessage = "name: no debe estar vacío; id: debe ser mayor que 0";
 
         assertEquals(expectedMessage, actualMessage);
     }

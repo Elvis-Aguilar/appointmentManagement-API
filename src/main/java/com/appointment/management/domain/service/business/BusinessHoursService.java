@@ -26,7 +26,7 @@ public class BusinessHoursService {
     }
 
     @Transactional
-    public BusinessHoursDto create(BusinessHoursDto dto) {
+    public BusinessHoursDto save(BusinessHoursDto dto) {
         BusinessHoursEntity entity = this.businessHoursMapper.toEntity(dto);
         BusinessHoursEntity savedEntity = this.businessHoursRepository.save(entity);
         return this.businessHoursMapper.toDto(savedEntity);
