@@ -25,7 +25,7 @@ public class BusinessHoursController {
 
     @PostMapping
     public ResponseEntity<BusinessHoursDto> createBusinessHours(@Valid @RequestBody BusinessHoursDto dto) {
-        BusinessHoursDto created = businessHoursService.create(dto);
+        BusinessHoursDto created = businessHoursService.save(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
