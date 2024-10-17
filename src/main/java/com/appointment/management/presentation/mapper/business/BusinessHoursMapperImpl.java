@@ -5,14 +5,19 @@
 
 package com.appointment.management.presentation.mapper.business;
 
+import com.appointment.management.application.exception.BadRequestException;
 import com.appointment.management.domain.dto.business.BusinessHoursDto;
+import com.appointment.management.persistance.entity.BusinessConfigurationEntity;
 import com.appointment.management.persistance.entity.BusinessHoursEntity;
+import com.appointment.management.persistance.enums.BusinessType;
 import com.appointment.management.persistance.enums.DayOfWeek;
 import com.appointment.management.persistance.enums.StatusBusinessHours;
 import com.appointment.management.presentation.mapper.helpers.BusinessConfigurationMapperHelper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,26 +29,44 @@ public class BusinessHoursMapperImpl implements BusinessHoursMapper {
     public BusinessHoursMapperImpl() {
     }
 
+    private StatusBusinessHours getStatus(String status){
+        try {
+            return StatusBusinessHours.valueOf(status);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid business Hours type: " + status);
+        }
+    }
+
+    private DayOfWeek getDayWeek(String dayWeek) {
+        try {
+            return DayOfWeek.valueOf(dayWeek);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid Day Week: " + dayWeek);
+        }
+    }
+
+    private BusinessConfigurationEntity getBussines(Long id){
+        BusinessConfigurationEntity entity = this.businessConfigurationMapperHelper.findById(id);
+        if (entity == null) {
+            throw new BadRequestException("Business Configuration not found with id: "+id);
+        }
+        return entity;
+    }
+
     public BusinessHoursEntity toEntity(BusinessHoursDto dto) {
         if (dto == null) {
             return null;
         } else {
             BusinessHoursEntity businessHoursEntity = new BusinessHoursEntity();
             businessHoursEntity.setId(dto.id());
-            businessHoursEntity.setBusiness(this.businessConfigurationMapperHelper.findById(dto.business()));
-            if (dto.dayOfWeek() != null) {
-                businessHoursEntity.setDayOfWeek((DayOfWeek)Enum.valueOf(DayOfWeek.class, dto.dayOfWeek()));
-            }
-
+            businessHoursEntity.setBusiness(this.getBussines(dto.business()));
             businessHoursEntity.setSpecificDate(dto.specificDate());
             businessHoursEntity.setOpeningTime(dto.openingTime());
             businessHoursEntity.setClosingTime(dto.closingTime());
-            if (dto.status() != null) {
-                businessHoursEntity.setStatus((StatusBusinessHours)Enum.valueOf(StatusBusinessHours.class, dto.status()));
-            }
-
+            businessHoursEntity.setStatus(this.getStatus(dto.status()));
             businessHoursEntity.setAvailableWorkers(dto.availableWorkers());
             businessHoursEntity.setAvailableAreas(dto.availableAreas());
+            businessHoursEntity.setDayOfWeek(this.getDayWeek(dto.dayOfWeek()));
             return businessHoursEntity;
         }
     }
@@ -65,42 +88,25 @@ public class BusinessHoursMapperImpl implements BusinessHoursMapper {
             createdAt = entity.getCreatedAt();
             id = entity.getId();
             business = this.businessConfigurationMapperHelper.toId(entity.getBusiness());
-            if (entity.getDayOfWeek() != null) {
-                dayOfWeek = entity.getDayOfWeek().name();
-            }
-
+            dayOfWeek = entity.getDayOfWeek().name();
             specificDate = entity.getSpecificDate();
             openingTime = entity.getOpeningTime();
             closingTime = entity.getClosingTime();
-            if (entity.getStatus() != null) {
-                status = entity.getStatus().name();
-            }
-
+            status = entity.getStatus().name();
             availableWorkers = entity.getAvailableWorkers();
             availableAreas = entity.getAvailableAreas();
-            BusinessHoursDto businessHoursDto = new BusinessHoursDto(id, business, dayOfWeek, specificDate, openingTime, closingTime, createdAt, status, availableWorkers, availableAreas);
-            return businessHoursDto;
+            return new BusinessHoursDto(id, business, dayOfWeek, specificDate, openingTime, closingTime, createdAt, status, availableWorkers, availableAreas);
         }
     }
 
     public void updateEntityFromDto(BusinessHoursDto dto, BusinessHoursEntity entity) {
         if (dto != null) {
             entity.setBusiness(this.businessConfigurationMapperHelper.findById(dto.business()));
-            if (dto.dayOfWeek() != null) {
-                entity.setDayOfWeek((DayOfWeek)Enum.valueOf(DayOfWeek.class, dto.dayOfWeek()));
-            } else {
-                entity.setDayOfWeek((DayOfWeek)null);
-            }
-
+            entity.setDayOfWeek(this.getDayWeek(dto.dayOfWeek()));
             entity.setSpecificDate(dto.specificDate());
             entity.setOpeningTime(dto.openingTime());
             entity.setClosingTime(dto.closingTime());
-            if (dto.status() != null) {
-                entity.setStatus((StatusBusinessHours)Enum.valueOf(StatusBusinessHours.class, dto.status()));
-            } else {
-                entity.setStatus((StatusBusinessHours)null);
-            }
-
+            entity.setStatus(this.getStatus(dto.status()));
             entity.setAvailableWorkers(dto.availableWorkers());
             entity.setAvailableAreas(dto.availableAreas());
         }

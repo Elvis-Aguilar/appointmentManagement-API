@@ -38,25 +38,16 @@ public class ServiceMapperImpl implements ServiceMapper {
         if (entity == null) {
             return null;
         } else {
-            Long id = null;
-            String name = null;
-            BigDecimal price = null;
-            LocalTime duration = null;
-            String description = null;
-            Integer peopleReaches = null;
-            String location = null;
-            String imageUrl = null;
-            id = entity.getId();
-            name = entity.getName();
-            price = entity.getPrice();
-            duration = entity.getDuration();
-            description = entity.getDescription();
-            peopleReaches = entity.getPeopleReaches();
-            location = entity.getLocation();
-            imageUrl = entity.getImageUrl();
-            String status = null;
-            ServiceDto serviceDto = new ServiceDto(id, name, price, duration, description, peopleReaches, location, imageUrl, (String)status);
-            return serviceDto;
+            Long id = entity.getId();
+            String name = entity.getName();
+            BigDecimal  price = entity.getPrice();
+            LocalTime duration = entity.getDuration();
+            String description = entity.getDescription();
+            Integer peopleReaches = entity.getPeopleReaches();
+            String location = entity.getLocation();
+            String imageUrl = entity.getImageUrl();
+            String status = entity.getStatus().name();
+            return new ServiceDto(id, name, price, duration, description, peopleReaches, location, imageUrl, status);
         }
     }
 
@@ -78,3 +69,5 @@ public class ServiceMapperImpl implements ServiceMapper {
         }
     }
 }
+
+
