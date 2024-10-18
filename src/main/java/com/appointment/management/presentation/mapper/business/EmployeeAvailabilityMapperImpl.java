@@ -5,8 +5,10 @@
 
 package com.appointment.management.presentation.mapper.business;
 
+import com.appointment.management.application.exception.BadRequestException;
 import com.appointment.management.domain.dto.business.EmployeeAvailabilityDto;
 import com.appointment.management.persistance.entity.EmployeeAvailabilityEntity;
+import com.appointment.management.persistance.entity.UserEntity;
 import com.appointment.management.persistance.enums.DayOfWeek;
 import com.appointment.management.presentation.mapper.helpers.UserMapperHelper;
 import java.time.LocalDateTime;
@@ -22,17 +24,30 @@ public class EmployeeAvailabilityMapperImpl implements EmployeeAvailabilityMappe
     public EmployeeAvailabilityMapperImpl() {
     }
 
+    private UserEntity getUser(Long id) {
+        UserEntity admin = this.userMapperHelper.findById(id);
+        if (admin == null) {
+            throw new BadRequestException("Admin not found with id: "+id);
+        }
+        return admin;
+    }
+
+    private DayOfWeek getDayWeek(String dayWeek) {
+        try {
+            return DayOfWeek.valueOf(dayWeek);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid Day Week: " + dayWeek);
+        }
+    }
+
     public EmployeeAvailabilityEntity toEntity(EmployeeAvailabilityDto dto) {
         if (dto == null) {
             return null;
         } else {
             EmployeeAvailabilityEntity employeeAvailabilityEntity = new EmployeeAvailabilityEntity();
             employeeAvailabilityEntity.setId(dto.id());
-            employeeAvailabilityEntity.setEmployee(this.userMapperHelper.findById(dto.employee()));
-            if (dto.dayOfWeek() != null) {
-                employeeAvailabilityEntity.setDayOfWeek((DayOfWeek)Enum.valueOf(DayOfWeek.class, dto.dayOfWeek()));
-            }
-
+            employeeAvailabilityEntity.setEmployee(this.getUser(dto.employee()));
+            employeeAvailabilityEntity.setDayOfWeek(this.getDayWeek(dto.dayOfWeek()));
             employeeAvailabilityEntity.setStartTime(dto.startTime());
             employeeAvailabilityEntity.setEndTime(dto.endTime());
             return employeeAvailabilityEntity;
@@ -52,26 +67,17 @@ public class EmployeeAvailabilityMapperImpl implements EmployeeAvailabilityMappe
             createdAt = entity.getCreatedAt();
             id = entity.getId();
             employee = this.userMapperHelper.toId(entity.getEmployee());
-            if (entity.getDayOfWeek() != null) {
-                dayOfWeek = entity.getDayOfWeek().name();
-            }
-
+            dayOfWeek = entity.getDayOfWeek().name();
             startTime = entity.getStartTime();
             endTime = entity.getEndTime();
-            EmployeeAvailabilityDto employeeAvailabilityDto = new EmployeeAvailabilityDto(id, employee, dayOfWeek, startTime, endTime, createdAt);
-            return employeeAvailabilityDto;
+            return new EmployeeAvailabilityDto(id, employee, dayOfWeek, startTime, endTime, createdAt);
         }
     }
 
     public void updateEntityFromDto(EmployeeAvailabilityDto dto, EmployeeAvailabilityEntity entity) {
         if (dto != null) {
-            entity.setEmployee(this.userMapperHelper.findById(dto.employee()));
-            if (dto.dayOfWeek() != null) {
-                entity.setDayOfWeek((DayOfWeek)Enum.valueOf(DayOfWeek.class, dto.dayOfWeek()));
-            } else {
-                entity.setDayOfWeek((DayOfWeek)null);
-            }
-
+            entity.setEmployee(this.getUser(dto.employee()));
+            entity.setDayOfWeek(this.getDayWeek(dto.dayOfWeek()));
             entity.setStartTime(dto.startTime());
             entity.setEndTime(dto.endTime());
         }
