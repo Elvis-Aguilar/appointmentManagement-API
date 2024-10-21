@@ -45,7 +45,7 @@ public class BusinessConfigurationMapperImpl implements BusinessConfigurationMap
             return null;
         } else {
             BusinessConfigurationEntity businessConfigurationEntity = new BusinessConfigurationEntity();
-            businessConfigurationEntity.setAdmin(this.getAdmin(dto.id()));
+            businessConfigurationEntity.setAdmin(this.getAdmin(dto.admin()));
             businessConfigurationEntity.setId(dto.id());
             businessConfigurationEntity.setName(dto.name());
             businessConfigurationEntity.setLogoUrl(dto.logoUrl());
