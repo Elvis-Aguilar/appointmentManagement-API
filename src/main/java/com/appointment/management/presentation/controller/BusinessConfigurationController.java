@@ -48,7 +48,7 @@ public class BusinessConfigurationController {
     public ResponseEntity<BusinessConfigurationDto> updateBusinessConfiguration(
             @Valid @PathVariable @Positive Long id,
             @Valid @RequestBody BusinessConfigurationDto businessConfigurationDto) {
-        System.out.println(businessConfigurationDto.toString());
+
         BusinessConfigurationDto updatedConfig = businessConfigurationService.update(id, businessConfigurationDto);
 
         return new ResponseEntity<>(updatedConfig, HttpStatus.OK);

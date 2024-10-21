@@ -56,6 +56,7 @@ public class BusinessConfigurationMapperImpl implements BusinessConfigurationMap
             businessConfigurationEntity.setCancellationSurcharge(dto.cancellationSurcharge());
             businessConfigurationEntity.setMaxDaysUpdate(dto.maxDaysUpdate());
             businessConfigurationEntity.setMaxHoursUpdate(dto.maxHoursUpdate());
+            businessConfigurationEntity.setEmployeeElection(dto.employeeElection());
             return businessConfigurationEntity;
         }
     }
@@ -88,7 +89,7 @@ public class BusinessConfigurationMapperImpl implements BusinessConfigurationMap
             maxDaysUpdate = entity.getMaxDaysUpdate();
             maxHoursUpdate = entity.getMaxHoursUpdate();
             LocalDateTime createdAt = entity.getCreatedAt();
-            return new BusinessConfigurationDto(id, name, logoUrl, admin, (LocalDateTime)createdAt, description, businessType, maxDaysCancellation, maxHoursCancellation, cancellationSurcharge, maxDaysUpdate, maxHoursUpdate);
+            return new BusinessConfigurationDto(id, name, logoUrl, admin, (LocalDateTime)createdAt, description, businessType, maxDaysCancellation, maxHoursCancellation, cancellationSurcharge, maxDaysUpdate, maxHoursUpdate, entity.isEmployeeElection());
         }
     }
 }
