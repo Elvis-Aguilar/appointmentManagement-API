@@ -34,6 +34,12 @@ public class BusinessConfigurationService {
                 .orElseThrow(() -> new ValueNotFoundException("Business configuration not found with ID: " + id));
     }
 
+    public BusinessConfigurationDto findFirst() {
+        Optional<BusinessConfigurationEntity> businessConfig = businessConfigurationRepository.findFirstByOrderByIdAsc();
+        return businessConfig.map(businessConfigurationMapper::toDto)
+                .orElseThrow(() -> new ValueNotFoundException("No business configuration found"));
+    }
+
 
     @Transactional
     public BusinessConfigurationDto update(Long id, BusinessConfigurationDto dto) {

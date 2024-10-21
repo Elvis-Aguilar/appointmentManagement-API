@@ -71,10 +71,11 @@ public class AuthController {
         String confirmationHtml = templateRendererService.renderTemplate("sign-up-confirmation", templateVariables);
 
         try {
-            emailService.sendHtmlEmail("Appointment Management", dbUser.email(),
+            emailService.sendHtmlEmail("Appointment-Management", dbUser.email(),
                     "Confirmacion de usuario en Appointment Management", confirmationHtml);
         } catch (MessagingException e) {
-            throw new RequestConflictException("No se pudo enviar el correo de confirmacion");
+           // System.out.println(e.getMessage());
+            throw new RequestConflictException("No se pudo enviar el correo de confirmacion "+e.getMessage());
         }
 
         return new ResponseEntity<>(dbUser, HttpStatus.CREATED);

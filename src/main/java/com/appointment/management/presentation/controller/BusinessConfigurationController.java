@@ -36,11 +36,19 @@ public class BusinessConfigurationController {
         return new ResponseEntity<>(businessConfiguration, HttpStatus.OK);
     }
 
+    @GetMapping()
+    public ResponseEntity<BusinessConfigurationDto> getBusinessConfigurationByFirst() {
+
+        BusinessConfigurationDto businessConfiguration = businessConfigurationService.findFirst();
+
+        return new ResponseEntity<>(businessConfiguration, HttpStatus.OK);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<BusinessConfigurationDto> updateBusinessConfiguration(
             @Valid @PathVariable @Positive Long id,
             @Valid @RequestBody BusinessConfigurationDto businessConfigurationDto) {
-
+        System.out.println(businessConfigurationDto.toString());
         BusinessConfigurationDto updatedConfig = businessConfigurationService.update(id, businessConfigurationDto);
 
         return new ResponseEntity<>(updatedConfig, HttpStatus.OK);
