@@ -74,7 +74,7 @@ public class AuthController {
             emailService.sendHtmlEmail("Appointment-Management", dbUser.email(),
                     "Confirmacion de usuario en Appointment Management", confirmationHtml);
         } catch (MessagingException e) {
-           // System.out.println(e.getMessage());
+           System.out.println(e.getMessage());
             throw new RequestConflictException("No se pudo enviar el correo de confirmacion "+e.getMessage());
         }
 

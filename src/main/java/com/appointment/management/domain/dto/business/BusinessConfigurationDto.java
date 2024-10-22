@@ -21,6 +21,7 @@ public record BusinessConfigurationDto(
         @NonNull @PositiveOrZero Integer maxHoursCancellation,
         @NonNull @PositiveOrZero BigDecimal cancellationSurcharge,
         @NonNull @PositiveOrZero Integer maxDaysUpdate,
-        @NonNull @PositiveOrZero BigDecimal maxHoursUpdate
+        @NonNull @PositiveOrZero BigDecimal maxHoursUpdate,
+        boolean employeeElection
 ) {
 }

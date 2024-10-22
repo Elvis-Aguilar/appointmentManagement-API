@@ -68,9 +68,8 @@ public class UserController {
 
         return ResponseEntity.ok(user);
     }
-    @GetMapping("/me")
-    public ResponseEntity<UserDto> getMyInformation(@NonNull HttpServletRequest request) {
-        long id = tokenService.getIdFromToken(request);
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDto> getMyInformation(@PathVariable Long id) {
         return ResponseEntity.of(userService.findUserById(id));
     }
 
@@ -85,19 +84,17 @@ public class UserController {
         return ResponseEntity.ok(addTokenToUserData(dbUser));
     }
 
-    @PatchMapping("/password")
-    public ResponseEntity<TokenDto> changePassword(@NonNull HttpServletRequest request,
+    @PatchMapping("/{id}")
+    public ResponseEntity<TokenDto> changePassword(@PathVariable Long id,
                                                    @RequestBody @Valid PasswordChangeDto user) {
-        long id = tokenService.getIdFromToken(request);
 
         UserWithGoogleSecretDto dbUser = userService.changeUserPassword(id, user.password(), user.repeatedPassword());
 
         return ResponseEntity.ok(addTokenToUserData(dbUser));
     }
 
-    @PutMapping("/profile")
-    public ResponseEntity<UserDto> updateUser(@NonNull HttpServletRequest request, @RequestBody @Valid UserProfileDto user) {
-        long id = tokenService.getIdFromToken(request);
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody @Valid UserProfileDto user) {
         UserDto userUpdate = this.userService.updateUser(id, user);
         return ResponseEntity.ok(userUpdate);
     }

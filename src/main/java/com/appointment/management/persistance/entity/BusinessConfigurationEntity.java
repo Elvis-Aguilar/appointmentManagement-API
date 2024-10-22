@@ -70,6 +70,10 @@ public class BusinessConfigurationEntity {
     @Column(name = "max_hours_update", nullable = false)
     private BigDecimal maxHoursUpdate;
 
+    @NonNull
+    @Column(name = "employee_election", nullable = false)
+    private boolean employeeElection = false;
+
     //realciones con tablas hijas
     @OneToMany(mappedBy = "business", fetch = FetchType.LAZY)
     private List<BusinessHoursEntity> businessHours;
