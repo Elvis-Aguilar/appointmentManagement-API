@@ -11,6 +11,6 @@ public record UserProfileDto(
         @NotBlank String nit,
         @NotBlank String cui,
         @NotBlank String phone,
-        @NotBlank String imageUrl
+        String imageUrl
 ) {
 }
