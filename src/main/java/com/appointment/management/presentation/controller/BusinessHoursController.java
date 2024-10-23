@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/business/hours")
+    @RequestMapping("/business/hours")
 public class BusinessHoursController {
 
     private final BusinessHoursService businessHoursService;
@@ -63,6 +63,12 @@ public class BusinessHoursController {
     @GetMapping("/all-general")
     public ResponseEntity<List<BusinessHoursDto>> getAllBusinessHoursWithNullSpecificDateIs() {
         List<BusinessHoursDto> businessHoursList = businessHoursService.getAllWithNullSpecificDateIs();
+        return ResponseEntity.ok(businessHoursList);
+    }
+
+    @GetMapping("/all-specific")
+    public ResponseEntity<List<BusinessHoursDto>> getAllBusinessHoursWithNotNullSpecificDateIs() {
+        List<BusinessHoursDto> businessHoursList = businessHoursService.getAllWithNotNullSpecificDate();
         return ResponseEntity.ok(businessHoursList);
     }
 

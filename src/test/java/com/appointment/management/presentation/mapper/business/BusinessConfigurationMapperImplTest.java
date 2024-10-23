@@ -50,7 +50,8 @@ class BusinessConfigurationMapperImplTest {
                 12,
                 BigDecimal.valueOf(15.00),
                 2,
-                BigDecimal.valueOf(15.00)
+                BigDecimal.valueOf(15.00),
+                false
         );
 
         entity = new BusinessConfigurationEntity();
@@ -116,7 +117,8 @@ class BusinessConfigurationMapperImplTest {
                 12,
                 BigDecimal.valueOf(15.00),
                 2,
-                BigDecimal.valueOf(15.00)
+                BigDecimal.valueOf(15.00),
+                false
         );
         when(userMapperHelper.findById(1L)).thenReturn(admin);
 

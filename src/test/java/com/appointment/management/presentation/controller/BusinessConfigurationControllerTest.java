@@ -39,7 +39,7 @@ class BusinessConfigurationControllerTest {
     void setup() {
         MockitoAnnotations.openMocks(this);
         validDto = new BusinessConfigurationDto(1L, "Test Business", "logo-url", 1L, null, "Test Description",
-                "SERVICES", 7, 2, BigDecimal.valueOf(100), 7, BigDecimal.valueOf(2));
+                "SERVICES", 7, 2, BigDecimal.valueOf(100), 7, BigDecimal.valueOf(2), false);
         // Inicializar el validador correctamente
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
@@ -122,7 +122,7 @@ class BusinessConfigurationControllerTest {
         // Crear DTO inválido
         BusinessConfigurationDto invalidDto = new BusinessConfigurationDto(
                 -1L, "afdfdfa", "invalid-url", 1L, null, "dfadfadfasdf", "SERVICES",
-                1, 2, BigDecimal.valueOf(100), 7, BigDecimal.valueOf(2)
+                1, 2, BigDecimal.valueOf(100), 7, BigDecimal.valueOf(2), false
         );
 
         Set<ConstraintViolation<BusinessConfigurationDto>> violations = validator.validate(invalidDto);
