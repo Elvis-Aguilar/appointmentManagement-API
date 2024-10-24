@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.function.Predicate.not;
 
@@ -82,6 +83,13 @@ public class UserService {
         }
         user.setPassword(encryptedPassword);
         return toUserForGoogleAuth(userRepository.save(user));
+    }
+
+    public List<UserDto> getAllUsersWithRole(Long roleId) {
+        List<UserEntity> usersWithRole = userRepository.findAllByRoleId(roleId);
+        return usersWithRole.stream()
+                .map(this::toUserDto)
+                .collect(Collectors.toList());
     }
 
     @Transactional
