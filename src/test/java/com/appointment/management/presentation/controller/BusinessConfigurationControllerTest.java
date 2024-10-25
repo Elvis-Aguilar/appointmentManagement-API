@@ -138,5 +138,20 @@ class BusinessConfigurationControllerTest {
         assertEquals(expectedMessage, actualMessage);
     }
 
+    @Test
+    void getBusinessConfigurationByFirst_ShouldReturnBusinessConfiguration_WhenFound() {
+        // Arrange: Configura el comportamiento del mock
+        when(businessConfigurationService.findFirst()).thenReturn(validDto);
+
+        // Act: Llama al método que estás probando
+        ResponseEntity<BusinessConfigurationDto> response = businessConfigurationController.getBusinessConfigurationByFirst();
+
+        // Assert: Verifica el resultado
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(validDto, response.getBody());
+    }
+
+
+
 
 }

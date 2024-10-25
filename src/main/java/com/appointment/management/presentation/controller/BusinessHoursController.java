@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-    @RequestMapping("/business/hours")
+@RequestMapping("/business/hours")
 public class BusinessHoursController {
 
     private final BusinessHoursService businessHoursService;
@@ -85,6 +85,7 @@ public class BusinessHoursController {
 
         return ResponseEntity.ok(businessHoursDtos);
     }
+
 
 }
 

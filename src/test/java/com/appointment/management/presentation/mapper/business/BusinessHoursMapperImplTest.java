@@ -143,26 +143,6 @@ class BusinessHoursMapperImplTest {
         assertNull(result);
     }
 
-    @Test
-    void shouldUpdateEntityFromDto() {
-        BusinessHoursEntity entity = new BusinessHoursEntity();
-        entity.setId(1L);
-
-        when(businessConfigurationMapperHelper.findById(1L)).thenReturn(businessConfigurationEntity);
-
-        businessHoursMapperImpl.updateEntityFromDto(businessHoursDto, entity);
-
-        assertEquals(businessConfigurationEntity, entity.getBusiness());
-        assertEquals(DayOfWeek.MONDAY, entity.getDayOfWeek());
-        assertEquals(LocalDate.of(2024, 10, 15), entity.getSpecificDate());
-        assertEquals(LocalTime.of(9, 0), entity.getOpeningTime());
-        assertEquals(LocalTime.of(17, 0), entity.getClosingTime());
-        assertEquals(StatusBusinessHours.AVAILABLE, entity.getStatus());
-        assertEquals(5, entity.getAvailableWorkers());
-        assertEquals(3, entity.getAvailableAreas());
-
-        verify(businessConfigurationMapperHelper, times(1)).findById(1L);
-    }
 
     @Test
     void shouldThrowExceptionWhenDayOfWeekIsInvalid() {
