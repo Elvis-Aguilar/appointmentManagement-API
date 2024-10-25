@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -97,6 +99,11 @@ public class UserController {
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody @Valid UserProfileDto user) {
         UserDto userUpdate = this.userService.updateUser(id, user);
         return ResponseEntity.ok(userUpdate);
+    }
+
+    @GetMapping("/role/{id}")
+    public ResponseEntity<List<UserDto>> getUsersWithRole(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getAllUsersWithRole(id));
     }
 
 

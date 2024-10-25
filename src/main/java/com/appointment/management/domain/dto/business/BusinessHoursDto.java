@@ -18,8 +18,8 @@ public record BusinessHoursDto(
         @NonNull LocalTime closingTime,
         LocalDateTime createdAt,
         @NotBlank String status,
-        @NonNull @PositiveOrZero Integer availableWorkers,
-        @NonNull @PositiveOrZero Integer availableAreas
+        @PositiveOrZero Integer availableWorkers,
+        @PositiveOrZero Integer availableAreas
 
 ) {
 }

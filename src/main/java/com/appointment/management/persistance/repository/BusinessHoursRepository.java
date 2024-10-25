@@ -10,5 +10,7 @@ public interface BusinessHoursRepository extends JpaRepository<BusinessHoursEnti
 
     List<BusinessHoursEntity> findBySpecificDateIsNull();
 
+    List<BusinessHoursEntity> findBySpecificDateIsNotNull();
+
     List<BusinessHoursEntity> findBySpecificDateBetween(LocalDate startDate, LocalDate endDate);
 }

@@ -51,7 +51,8 @@ class BusinessConfigurationServiceTest {
                 12,
                 BigDecimal.valueOf(100.00),
                 2,
-                BigDecimal.valueOf(24.00)
+                BigDecimal.valueOf(24.00),
+                false
         );
 
         businessConfigurationEntity = new BusinessConfigurationEntity();

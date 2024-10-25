@@ -66,6 +66,12 @@ public class BusinessHoursController {
         return ResponseEntity.ok(businessHoursList);
     }
 
+    @GetMapping("/all-specific")
+    public ResponseEntity<List<BusinessHoursDto>> getAllBusinessHoursWithNotNullSpecificDateIs() {
+        List<BusinessHoursDto> businessHoursList = businessHoursService.getAllWithNotNullSpecificDate() ;
+        return ResponseEntity.ok(businessHoursList);
+    }
+
     //funcion para ir a traer horarios en un rango segun la variable **LocalDate specificDate**
     @GetMapping("/range")
     public ResponseEntity<List<BusinessHoursDto>> getAllBusinessHoursSpecificDateIsRange(
@@ -79,6 +85,7 @@ public class BusinessHoursController {
 
         return ResponseEntity.ok(businessHoursDtos);
     }
+
 
 }
 

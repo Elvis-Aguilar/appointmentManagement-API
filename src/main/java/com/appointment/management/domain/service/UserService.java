@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.function.Predicate.not;
 
@@ -84,6 +85,13 @@ public class UserService {
         return toUserForGoogleAuth(userRepository.save(user));
     }
 
+    public List<UserDto> getAllUsersWithRole(Long roleId) {
+        List<UserEntity> usersWithRole = userRepository.findAllByRoleId(roleId);
+        return usersWithRole.stream()
+                .map(this::toUserDto)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public UserDto addGoogleAuthentication(Long userId, String authKey) {
         UserEntity user = userRepository.findById(userId)
@@ -96,16 +104,46 @@ public class UserService {
 
     @Transactional
     public UserDto registerUser(SignUpDto user) {
+        // Validar si el email ya está en uso
         if (userRepository.existsByEmail(user.email())) {
-            throw new BadRequestException("El email que se intenta registrar ya esta en uso");
+            throw new BadRequestException("El email que se intenta registrar ya está en uso");
         }
+
+        // Validar si el CUI ya está en uso
+        if (userRepository.existsByCui(user.cui())) {
+            throw new BadRequestException("El CUI que se intenta registrar ya está en uso");
+        }
+
+        // Validar si el NIT ya está en uso
+        if (userRepository.existsByNit(user.nit())) {
+            throw new BadRequestException("El NIT que se intenta registrar ya está en uso");
+        }
+
+        // Validar si el teléfono ya está en uso
+        if (userRepository.existsByPhone(user.phone())) {
+            throw new BadRequestException("El número de teléfono que se intenta registrar ya está en uso");
+        }
+
+        // Encriptar la contraseña
         String encryptedPassword = encoder.encode(user.password());
 
-        RoleEntity role = roleRepository.findByName("CLIENTE").or(() -> roleRepository.findById(1L)).orElseThrow();
+        // Buscar el rol "CLIENTE" o usar el ID 1 por defecto
+        RoleEntity role = roleRepository.findByName("CLIENTE")
+                .or(() -> roleRepository.findById(1L))
+                .orElseThrow();
 
-        UserEntity newUser = new UserEntity(user.name(),user.cui(), encryptedPassword,
-                user.nit(), user.email(), user.phone(), role);
+        // Crear el nuevo usuario
+        UserEntity newUser = new UserEntity(
+                user.name(),
+                user.cui(),
+                encryptedPassword,
+                user.nit(),
+                user.email(),
+                user.phone(),
+                role
+        );
 
+        // Guardar y devolver el DTO del usuario registrado
         return toUserDto(userRepository.save(newUser));
     }
 

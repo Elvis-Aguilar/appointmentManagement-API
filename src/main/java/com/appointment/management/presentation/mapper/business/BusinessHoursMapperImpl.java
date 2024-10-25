@@ -101,14 +101,11 @@ public class BusinessHoursMapperImpl implements BusinessHoursMapper {
 
     public void updateEntityFromDto(BusinessHoursDto dto, BusinessHoursEntity entity) {
         if (dto != null) {
-            entity.setBusiness(this.businessConfigurationMapperHelper.findById(dto.business()));
             entity.setDayOfWeek(this.getDayWeek(dto.dayOfWeek()));
             entity.setSpecificDate(dto.specificDate());
             entity.setOpeningTime(dto.openingTime());
             entity.setClosingTime(dto.closingTime());
             entity.setStatus(this.getStatus(dto.status()));
-            entity.setAvailableWorkers(dto.availableWorkers());
-            entity.setAvailableAreas(dto.availableAreas());
         }
     }
 }

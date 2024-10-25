@@ -90,6 +90,14 @@ public class BusinessHoursService {
     }
 
     @Transactional(readOnly = true)
+    public List<BusinessHoursDto> getAllWithNotNullSpecificDate() {
+        List<BusinessHoursEntity> entities = businessHoursRepository.findBySpecificDateIsNotNull();
+        return entities.stream()
+                .map(businessHoursMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public List<BusinessHoursDto> getBusinessHoursInDateRange(LocalDate startDate, LocalDate endDate) {
         List<BusinessHoursEntity> entities = businessHoursRepository.findBySpecificDateBetween(startDate, endDate);
         return entities.stream()

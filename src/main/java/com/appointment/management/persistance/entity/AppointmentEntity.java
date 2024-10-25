@@ -1,5 +1,6 @@
 package com.appointment.management.persistance.entity;
 
+import com.appointment.management.persistance.enums.PaymentMethod;
 import com.appointment.management.persistance.enums.StatusAppointment;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,6 +11,7 @@ import java.util.List;
 @Entity
 @Table(name = "appointment")
 @Getter
+@Setter
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -50,7 +52,7 @@ public class AppointmentEntity {
     @NonNull
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", nullable = false)
-    private StatusAppointment paymentMethod;
+    private PaymentMethod paymentMethod;
 
     //manejo de relaciones con tablas hijas
     @OneToOne(mappedBy = "appointment")
