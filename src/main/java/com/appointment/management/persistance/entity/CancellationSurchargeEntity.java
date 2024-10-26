@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "cancellation_surcharge")
 @Getter
+@Setter
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(of = "id")

@@ -47,8 +47,14 @@ public class AppointmentController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<AppointmentDto> updateServiceStatus(@PathVariable Long id, @RequestBody String status) {
+    public ResponseEntity<AppointmentDto> updateServiceStatusCompleted(@PathVariable Long id, @RequestBody String status) {
         AppointmentDto result = this.appointmentService.completedAppointment(id);
+        return ResponseEntity.ok(result);
+    }
+
+    @PatchMapping("/canceled/{id}")
+    public ResponseEntity<AppointmentDto> updateServiceStatusCanceled(@PathVariable Long id, @RequestBody String status) {
+        AppointmentDto result = this.appointmentService.canceledAppointment(id);
         return ResponseEntity.ok(result);
     }
 

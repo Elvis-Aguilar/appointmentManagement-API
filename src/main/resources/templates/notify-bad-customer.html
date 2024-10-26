@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><!DOCTYPE html>
+        <html lang="es" xmlns:th="http://www.thymeleaf.org">
+        <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Factura</title>
+    <style>
+        body {
+            font-family: "Arial", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #7f7fa1;
+            color: #cdd6f4;
+        }
+        p{
+            color: white;
+        }
+        h1,
+        h2 {
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #94e2d5;
+            font-size: 4rem;
+        }
+        h2 {
+            color: #a6adc8;
+        }
+        strong,
+        th {
+            color: #b4befe;
+        }
+
+        .flex {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            width: 800px;
+            margin: 50px auto;
+            background-color: #313244;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #b4befe;
+        }
+
+        .logo {
+            max-width: 150px;
+            max-height: 150px;
+        }
+
+        .invoice,
+        .client,
+        .invoice-details {
+            margin-bottom: 30px;
+            background-color: #181825;
+            padding: 10px 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .totals {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr;
+            gap: 0px 0px;
+            grid-auto-flow: row;
+            grid-template-areas: "nothing nothing totals";
+        }
+
+        .totals > *:first-child {
+            grid-area: totals;
+        }
+
+        .totals > * > * {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr;
+            gap: 0px 0px;
+            grid-auto-flow: row;
+            grid-template-areas: "title value";
+        }
+
+        .totals > * > *:first-child {
+            grid-area: title;
+        }
+
+        .totals > * > *:last-child {
+            grid-area: value;
+        }
+
+        .info {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 0px 0px;
+            grid-auto-flow: row;
+            grid-template-areas: "title info-1 info-1" "title info-2 info-2";
+        }
+
+        .info > .title {
+            grid-area: title;
+        }
+
+        .info > *:not(.title):first-child {
+            grid-area: info-1;
+        }
+
+        .info > *:not(.title):last-child {
+            grid-area: info-2;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+            color: white;
+        }
+
+        th {
+            background-color: #1e1e2e;
+        }
+
+        .totals p {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Información de la Empresa -->
+    <div class="header">
+        <div class="flex">
+            <img
+                    th:src="@{${company.logoUrl}}"
+                    src="/image.png"
+                    alt="Logo Empresa"
+                    class="logo"
+            />
+            <h1 th:text="${company.name}">Cloudmerce</h1>
+        </div>
+        <p >Zona 4 Ciudad Capital</p>
+        <p >2250832</p>
+        <p >Appoinment@gmail.com</p>
+    </div>
+
+    <div class="invoice info">
+        <h2 class="title">Notificacion Mal uso de Aplicacion</h2>
+        <p>
+            <strong>Número:</strong>
+            <span>0501</span>
+        </p>
+        <p>
+            <strong>Fecha:</strong>
+            <span th:text="${order_date}">01/01/2024</span>
+        </p>
+    </div>
+
+    <div class="client info">
+        <h2 class="title">Cliente: </h2>
+        <p>
+            <strong>Nombre:</strong>
+            <span th:text="${client.name}">Nombre del Cliente</span>
+        </p>
+        <p>
+            <strong>NIT:</strong>
+            <span th:text="${client.nit}">NIT del Cliente</span>
+        </p>
+
+        <p>
+            <strong>Descripcion:</strong>
+            <span>Por este medio se le hace constar el mal uso de nuestra aplicacion, cancelar una cita fuera de los limites
+            afecta nuestra empresa, ahora esta en la lista de clientes de mal comportamiento, en su siguiente servicio se le cobrara</span>
+            una mora de <strong th:text="${mora}">Descripcion:</strong>
+        </p>
+    </div>
+
+    <div class="invoice-details">
+        <h2>Datos de la Cita Cancelada</h2>
+        <br />
+        <table>
+            <thead>
+            <tr>
+                <th>Cantidad</th>
+                <th>Servicio</th>
+                <th>Fecha</th>
+                <th>Precio Unitario</th>
+                <th>Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td >1</td>
+                <td th:text="${servicio}">Nombre del servicio</td>
+                <td th:text="${fecha}">Q. 0.00</td>
+                <td th:text="${price}">Q. 0.00</td>
+                <td th:text="${price}">Q. 0.00</td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+</body>
+</html>
+</title>
+</head>
+<body>
+
+</body>
+</html>

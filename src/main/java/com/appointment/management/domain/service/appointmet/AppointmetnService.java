@@ -10,11 +10,9 @@ import com.appointment.management.domain.service.auth.EmailService;
 import com.appointment.management.domain.service.auth.TemplateRendererService;
 import com.appointment.management.domain.service.business.BusinessConfigurationService;
 import com.appointment.management.domain.service.business.ServiceService;
-import com.appointment.management.persistance.entity.AppointmentEntity;
-import com.appointment.management.persistance.entity.BusinessConfigurationEntity;
-import com.appointment.management.persistance.entity.ServiceEntity;
-import com.appointment.management.persistance.entity.UserEntity;
+import com.appointment.management.persistance.entity.*;
 import com.appointment.management.persistance.enums.StatusAppointment;
+import com.appointment.management.persistance.enums.StatusCancellation;
 import com.appointment.management.persistance.repository.AppointmentRepository;
 import com.appointment.management.presentation.mapper.business.AppointmentMapper;
 import jakarta.mail.MessagingException;
@@ -52,6 +50,9 @@ public class AppointmetnService {
 
     @Autowired
     private ServiceService serviceService;
+
+    @Autowired
+    private  CancellationSurchargeService cancellationSurchargeService;
 
     @Transactional(readOnly = true)
     public List<AppointmentDto> getAllAppointments() {
@@ -135,6 +136,52 @@ public class AppointmetnService {
         try {
             emailService.sendHtmlEmail("Appointment-Management", user.email(),
                     "Facturacion ", confirmationHtml);
+        } catch (MessagingException e) {
+            System.out.println(e.getMessage());
+            throw new RequestConflictException("No se pudo enviar el correo de confirmacion "+e.getMessage());
+        }
+
+        return appointmentMapper.toDto(updatedEntity);
+
+    }
+
+    public AppointmentDto canceledAppointment(Long id) {
+        AppointmentEntity existingAppointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
+        existingAppointment.setStatus(StatusAppointment.CANCELED);
+
+        AppointmentEntity updatedEntity = appointmentRepository.save(existingAppointment);
+
+        /*logica de notificacion y agregar a lista malos usuarios*/
+
+        /* agregar a lista de malos empleados**/
+        UserEntity userEntity = userService.findUserByIdEntity(existingAppointment.getCustomer().getId());
+        CancellationSurchargeEntity cancellationSurchargeEntity = new CancellationSurchargeEntity(existingAppointment, userEntity, StatusCancellation.PENDING);
+        this.cancellationSurchargeService.create(cancellationSurchargeEntity);
+
+        /*logica de envio de notificacion al correo*/
+        BusinessConfigurationDto busines = this.businessConfigurationService.findFirst();
+        LocalDate date = LocalDate.now();
+        UserDto user = userService.findUserById(existingAppointment.getCustomer().getId()).orElseThrow();
+        ServiceDto service = this.serviceService.getServiceById(existingAppointment.getService().getId());
+        LocalDate dateService = existingAppointment.getStartDate().toLocalDate();
+
+        /*logica de envio de notificacion al correo*/
+        Map<String, Object> templateVariables = Map.of(
+                "company", busines,
+                "order_date",date,
+                "client", user,
+                "servicio", service.name(),
+                "fecha",dateService,
+                "price", service.price(),
+                "mora",busines.cancellationSurcharge()
+        );
+
+        String confirmationHtml = templateRendererService.renderTemplate("notify-bad-customer", templateVariables);
+
+        try {
+            emailService.sendHtmlEmail("Appointment-Management", user.email(),
+                    "Notificacion Mal Uso ", confirmationHtml);
         } catch (MessagingException e) {
             System.out.println(e.getMessage());
             throw new RequestConflictException("No se pudo enviar el correo de confirmacion "+e.getMessage());
