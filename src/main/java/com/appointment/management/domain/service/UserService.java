@@ -68,6 +68,10 @@ public class UserService {
         return userRepository.findByEmail(email).map(this::toUserDto);
     }
 
+    public UserEntity findUserByIdEntity(Long userId) {
+        return userRepository.findById(userId).orElse(new UserEntity());
+    }
+
     public Optional<UserWithGoogleSecretDto> findUserWithGoogleKeyByEmail(String email) {
         return userRepository.findByEmail(email).map(this::toUserForGoogleAuth);
     }

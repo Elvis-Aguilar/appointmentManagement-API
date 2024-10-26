@@ -1,6 +1,7 @@
 package com.appointment.management.presentation.controller;
 
 import com.appointment.management.domain.dto.appoinment.AppointmentDto;
+import com.appointment.management.domain.dto.business.ServiceDto;
 import com.appointment.management.domain.service.appointmet.AppointmetnService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -43,6 +44,18 @@ public class AppointmentController {
                                                             @RequestBody @Valid AppointmentDto appointmentDto) {
         AppointmentDto updatedAppointment = appointmentService.updateAppointment(id, appointmentDto);
         return ResponseEntity.ok(updatedAppointment);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<AppointmentDto> updateServiceStatusCompleted(@PathVariable Long id, @RequestBody String status) {
+        AppointmentDto result = this.appointmentService.completedAppointment(id);
+        return ResponseEntity.ok(result);
+    }
+
+    @PatchMapping("/canceled/{id}")
+    public ResponseEntity<AppointmentDto> updateServiceStatusCanceled(@PathVariable Long id, @RequestBody String status) {
+        AppointmentDto result = this.appointmentService.canceledAppointment(id);
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/{id}")
