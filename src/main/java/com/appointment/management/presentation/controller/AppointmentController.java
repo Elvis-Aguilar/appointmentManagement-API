@@ -1,20 +1,44 @@
 package com.appointment.management.presentation.controller;
 
 import com.appointment.management.domain.dto.appoinment.AppointmentDto;
+import com.appointment.management.domain.dto.business.BusinessConfigurationDto;
 import com.appointment.management.domain.dto.business.ServiceDto;
+import com.appointment.management.domain.dto.report.AppointmentReportDto;
+import com.appointment.management.domain.dto.report.AppointmentReportItemDto;
+import com.appointment.management.domain.dto.report.ServiceItemDto;
+import com.appointment.management.domain.dto.report.ServiceSendDto;
 import com.appointment.management.domain.service.appointmet.AppointmetnService;
+import com.appointment.management.domain.service.business.BusinessConfigurationService;
+import com.appointment.management.domain.service.report.DownloadExcelService;
+import com.appointment.management.domain.service.report.DownloadPdfService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/appointment")
 public class AppointmentController {
 
     private final AppointmetnService appointmentService;
+
+    @Autowired
+    private  DownloadPdfService downloadPdfService;
+
+    @Autowired
+    private BusinessConfigurationService businessConfigurationService;
+
+    @Autowired
+    private DownloadExcelService downloadExcelService;
+
 
     public AppointmentController(AppointmetnService appointmentService) {
         this.appointmentService = appointmentService;
@@ -62,5 +86,51 @@ public class AppointmentController {
     public ResponseEntity<Void> deleteAppointment(@PathVariable Long id) {
         appointmentService.deleteAppointment(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/downloadPDF")
+    public ResponseEntity<Resource> downloadReport(@RequestBody AppointmentReportDto appointmentReportDto) {
+        BusinessConfigurationDto busines = this.businessConfigurationService.findFirst();
+
+        Map<String, Object> templateVariables = Map.of(
+                "items",appointmentReportDto.items(),
+                "total", appointmentReportDto.total(),
+                "size", appointmentReportDto.items().size(),
+                "filter", appointmentReportDto.filtro(),
+                "rangeDate", appointmentReportDto.rangeDate(),
+                "dateReport", LocalDate.now(),
+                "nameCompany", busines.name(),
+                "companyLogo", busines.logoUrl()
+        );
+        return this.downloadPdfService.downloadPdf("report-appointment", templateVariables);
+    }
+
+    @PostMapping("/download-excel")
+    ResponseEntity<byte[]>downloadReportExcel(@RequestBody AppointmentReportDto dto)throws IOException {
+        BusinessConfigurationDto busines = this.businessConfigurationService.findFirst();
+        List<AppointmentReportItemDto> items = dto.items();
+        List<String> headers = new ArrayList<>();
+        headers.add("Cliente");
+        headers.add("Servicio");
+        headers.add("Fecha");
+        headers.add("Hora");
+        headers.add("Empleado");
+        headers.add("Precio Q");
+        List<Object> userObjects = new ArrayList<>();
+        for (AppointmentReportItemDto item : items) {
+            userObjects.add(item.cliente() == null ? "" : item.cliente());
+            userObjects.add(item.servicio() == null ? "" : item.servicio());
+            userObjects.add(item.fecha() == null ? "" : item.fecha() );
+            userObjects.add(item.horaInicio() == null ? "" : item.horaInicio());
+            userObjects.add(item.empleado() == null ? "" : item.empleado());
+            userObjects.add(item.price() == null ? "" : item.price());
+        }
+        userObjects.add("Total General");
+        userObjects.add("");
+        userObjects.add("");
+        userObjects.add("");
+        userObjects.add("");
+        userObjects.add(dto.total());
+        return this.downloadExcelService.generateExcelReport(headers, userObjects, "reporte_Citas", busines, "Reporte Citas", dto.filtro(), dto.rangeDate(), dto.items().size());
     }
 }
