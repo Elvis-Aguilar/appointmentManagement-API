@@ -2,6 +2,9 @@ package com.appointment.management.persistance.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 
 @Entity
 @Table(name = "user_permission")
@@ -25,5 +28,4 @@ public class UserPermissionEntity {
     @ManyToOne
     @JoinColumn(name = "permission_id", nullable = false)
     private PermissionEntity permission;
-
 }

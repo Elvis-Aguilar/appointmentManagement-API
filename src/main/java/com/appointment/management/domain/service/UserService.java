@@ -180,4 +180,16 @@ public class UserService {
 
         return toUserForGoogleAuth(userRepository.save(dbUser));
     }
+
+    @Transactional
+    public UserDto changeUserRole(Long userId, Long newRoleId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new ValueNotFoundException("No se pudo encontrar el usuario"));
+
+        RoleEntity newRole = roleRepository.findById(newRoleId)
+                .orElseThrow(() -> new ValueNotFoundException("No se pudo encontrar el rol"));
+
+        user.setRole(newRole);
+        return toUserDto(userRepository.save(user));
+    }
 }
