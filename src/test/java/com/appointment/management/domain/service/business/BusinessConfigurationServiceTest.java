@@ -164,4 +164,51 @@ class BusinessConfigurationServiceTest {
         assertTrue(thrown.getMessage().contains("Configuracion del negocio no encontradas con el Id: " + id));
     }
 
+    @DisplayName("Cuando se busca la primera configuración del negocio y existe" +
+            " se espera que se devuelva la configuración correcta")
+    @Test
+    void shouldReturnFirstBusinessConfigurationWhenExists() {
+        // Dado
+        BusinessConfigurationEntity firstEntity = new BusinessConfigurationEntity();
+        firstEntity.setId(1L);
+        firstEntity.setName("First Business");
+
+        BusinessConfigurationDto firstDto = new BusinessConfigurationDto(
+                firstEntity.getName(),
+                firstEntity.getLogoUrl()
+        );
+
+        when(businessConfigurationRepository.findFirstByOrderByIdAsc())
+                .thenReturn(Optional.of(firstEntity));
+        when(businessConfigurationMapper.toDto(firstEntity)).thenReturn(firstDto);
+
+        // Cuando
+        BusinessConfigurationDto result = businessConfigurationService.findFirst();
+
+        // Entonces
+        assertNotNull(result);
+        assertEquals(firstDto.name(), result.name());
+        assertEquals(firstDto.logoUrl(), result.logoUrl());
+        assertEquals(firstDto.description(), result.description());
+    }
+
+    @DisplayName("Cuando se busca la primera configuración del negocio y no existe" +
+            " se espera una excepción de ValueNotFoundException")
+    @Test
+    void shouldThrowExceptionWhenNoBusinessConfigurationFound() {
+        // Dado
+        when(businessConfigurationRepository.findFirstByOrderByIdAsc())
+                .thenReturn(Optional.empty());
+
+        // Cuando / Entonces
+        ValueNotFoundException thrown = assertThrows(
+                ValueNotFoundException.class,
+                () -> businessConfigurationService.findFirst(),
+                "Expected findFirst() to throw, but it didn't"
+        );
+
+        assertTrue(thrown.getMessage().contains("No business configuration found"));
+    }
+
+
 }

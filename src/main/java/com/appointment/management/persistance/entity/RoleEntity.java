@@ -8,6 +8,7 @@ import java.util.List;
 @Entity
 @Table(name = "role")
 @Getter
+@Setter
 @NoArgsConstructor
 @RequiredArgsConstructor
 @EqualsAndHashCode(of = "id")
