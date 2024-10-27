@@ -24,4 +24,8 @@ public record BusinessConfigurationDto(
         @NonNull @PositiveOrZero BigDecimal maxHoursUpdate,
         boolean employeeElection
 ) {
+    public BusinessConfigurationDto(String name, String logoUrl) {
+        this(null, name, logoUrl, 1L, LocalDateTime.now(), "Default description", "Default business type",
+                7, 24, BigDecimal.ZERO, 7, BigDecimal.ZERO, false);
+    }
 }

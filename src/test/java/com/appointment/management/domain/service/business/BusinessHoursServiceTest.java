@@ -276,4 +276,35 @@ class BusinessHoursServiceTest {
         verify(businessHoursRepository, times(1)).saveAll(anyList());
         verify(businessHoursMapper, times(2)).toDto(any(BusinessHoursEntity.class));
     }
+
+    @Test
+    void testGetAllWithNotNullSpecificDate() {
+        // Arrange
+        BusinessHoursEntity businessHoursEntityWithSpecificDate = new BusinessHoursEntity();
+        businessHoursEntityWithSpecificDate.setId(1L);
+        businessHoursEntityWithSpecificDate.setOpeningTime(LocalTime.of(9, 0));
+        businessHoursEntityWithSpecificDate.setClosingTime(LocalTime.of(17, 0));
+        businessHoursEntityWithSpecificDate.setAvailableWorkers(5);
+        businessHoursEntityWithSpecificDate.setAvailableAreas(2);
+        businessHoursEntityWithSpecificDate.setSpecificDate(LocalDate.now()); // Suponiendo que este campo existe
+
+        List<BusinessHoursEntity> entities = List.of(businessHoursEntityWithSpecificDate);
+
+        // Simular el comportamiento del repositorio y el mapper
+        when(businessHoursRepository.findBySpecificDateIsNotNull()).thenReturn(entities);
+        when(businessHoursMapper.toDto(businessHoursEntityWithSpecificDate)).thenReturn(businessHoursDto);
+
+        // Act
+        List<BusinessHoursDto> result = businessHoursService.getAllWithNotNullSpecificDate();
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(businessHoursDto, result.get(0));
+
+        // Verificar que el método del repositorio fue llamado
+        verify(businessHoursRepository, times(1)).findBySpecificDateIsNotNull();
+        verify(businessHoursMapper, times(1)).toDto(businessHoursEntityWithSpecificDate);
+    }
+
 }

@@ -36,12 +36,6 @@ public class UserService {
     private RoleRepository roleRepository;
 
     @Autowired
-    private UserPermissionRepository userPermissionRepository;
-
-    @Autowired
-    private PermissionRepository permissionRepository;
-
-    @Autowired
     private PasswordEncoder encoder;
 
     private UserWithGoogleSecretDto toUserForGoogleAuth(UserEntity user) {
