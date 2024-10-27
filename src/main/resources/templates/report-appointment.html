@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reporte de Citas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            width: 94%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .header .left {
+            width: 70%; /* Ajuste de anchura del contenedor de texto */
+        }
+
+        .header .left h1 {
+            font-size: 24px;
+            margin: 10px 0;
+            color: #333;
+        }
+
+        .header .left h2 {
+            font-size: 18px;
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .header .left p {
+            font-size: 14px;
+            margin: 5px 0;
+            color: #777;
+        }
+
+        .header img {
+            width: 150px;
+            height: auto;
+            position: absolute;
+            right: 0;
+            top: 0;
+            object-fit: contain;
+        }
+
+        .report-info {
+            margin-bottom: 20px;
+        }
+
+        .company-info,
+        .report-details {
+            width: 45%;
+            float: left;
+            margin-bottom: 10px;
+        }
+
+        .company-info {
+            margin-right: 10%;
+        }
+
+        .report-details p,
+        .company-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .clearfix {
+            clear: both;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Encabezado del reporte -->
+    <div class="header">
+        <div class="left">
+            <h1>Reporte de Citas </h1>
+            <h2 th:text="${nameCompany} ">compania X.Y.Z</h2>
+        </div>
+        <img
+                th:src="@{${companyLogo}}"
+                src="/image.png"
+                alt="Logo Empresa"
+                class="logo"
+        />
+    </div>
+
+    <!-- Información de la empresa y del reporte -->
+    <div class="report-info">
+        <div class="company-info">
+            <h3>Detalles del Reporte</h3>
+            <p><strong>Fecha del reporte:</strong> <span th:text="${dateReport}">--</span> </p>
+            <p><strong>Tipo Reporte: </strong><span>Reporte de Citas</span></p>
+            <p><strong>Periodo:</strong> <span th:text="${rangeDate}">---</span> </p>
+        </div>
+
+        <div class="report-details">
+            <h3>Filtros Aplicados</h3>
+            <p><strong>Cantidad :</strong> <span th:text="${size}">---</span></p>
+            <p><strong>Tipo Criterio: </strong><span th:text="${filter}">---</span></p>
+        </div>
+
+        <div class="clearfix"></div>
+    </div>
+
+    <!-- Tabla de ventas -->
+    <table>
+        <thead>
+        <tr>
+            <th>cliente</th>
+            <th>Servicio</th>
+            <th>Fechao</th>
+            <th>Hora</th>
+            <th>Empleado</th>
+            <th>Precio</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${items}">
+            <td th:text="${item.cliente}">Cliente A</td>
+            <td th:text="${item.servicio}">50</td>
+            <td th:text="${item.fecha}">10</td>
+            <td th:text="${item.horaInicio}">Q 500.00</td>
+            <td th:text="${item.empleado}">Q 500.00</td>
+            <td th:text="Q + ${item.price}">Q 500.00</td>
+        </tr>
+        <tr>
+            <th colspan="5">Total :</th>
+            <th th:text="${total}">Q 1550.00</th>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Pie de página del reporte -->
+    <div class="footer">
+        <p>Reporte generado automáticamente por el Sistema de Reportes. Todos los derechos reservados © 2024</p>
+    </div>
+</div>
+</body>
+</html>
