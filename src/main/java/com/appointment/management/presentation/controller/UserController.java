@@ -14,11 +14,13 @@ import com.appointment.management.domain.dto.user.UserProfileDto;
 import com.appointment.management.domain.service.UserService;
 import com.appointment.management.domain.service.auth.GoogleAuthService;
 import com.appointment.management.domain.service.auth.TokenService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -106,5 +108,22 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsersWithRole(id));
     }
 
+    @PatchMapping("/prob/{userId}/role/{newRoleId}")
+    public ResponseEntity<UserDto> changeUserRole(@PathVariable Long userId, @PathVariable Long newRoleId) {
+        try {
+            UserDto updatedUser = userService.changeUserRole(userId, newRoleId);
+            return ResponseEntity.ok(updatedUser);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> getMyInformation(@NonNull HttpServletRequest request) {
+        long id = tokenService.getIdFromToken(request);
+
+        return ResponseEntity.of(userService.findUserById(id));
+    }
 
 }
