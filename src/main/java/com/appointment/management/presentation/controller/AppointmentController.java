@@ -7,8 +7,11 @@ import com.appointment.management.domain.dto.report.AppointmentReportDto;
 import com.appointment.management.domain.dto.report.AppointmentReportItemDto;
 import com.appointment.management.domain.dto.report.ServiceItemDto;
 import com.appointment.management.domain.dto.report.ServiceSendDto;
+import com.appointment.management.domain.dto.user.UserDto;
+import com.appointment.management.domain.service.UserService;
 import com.appointment.management.domain.service.appointmet.AppointmetnService;
 import com.appointment.management.domain.service.business.BusinessConfigurationService;
+import com.appointment.management.domain.service.business.ServiceService;
 import com.appointment.management.domain.service.report.DownloadExcelService;
 import com.appointment.management.domain.service.report.DownloadPdfService;
 import jakarta.validation.Valid;
@@ -19,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +42,12 @@ public class AppointmentController {
 
     @Autowired
     private DownloadExcelService downloadExcelService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private ServiceService serviceService;
 
 
     public AppointmentController(AppointmetnService appointmentService) {
@@ -133,4 +143,34 @@ public class AppointmentController {
         userObjects.add(dto.total());
         return this.downloadExcelService.generateExcelReport(headers, userObjects, "reporte_Citas", busines, "Reporte Citas", dto.filtro(), dto.rangeDate(), dto.items().size());
     }
+
+    @PostMapping("/downloadBill/{id}")
+    public ResponseEntity<Resource> downloadBill(@PathVariable Long id, @RequestBody String status) {
+
+        BusinessConfigurationDto busines = this.businessConfigurationService.findFirst();
+        AppointmentDto appointmentDto = this.appointmentService.getAppointmentById(id).orElseThrow();
+        LocalDate date = LocalDate.now();
+        UserDto user = userService.findUserById(appointmentDto.customer()).orElseThrow();
+        ServiceDto service = this.serviceService.getServiceById(appointmentDto.service());
+        LocalDate dateService = appointmentDto.startDate().toLocalDate();
+
+        BigDecimal price = service.price();
+        BigDecimal additionalAmount = new BigDecimal("15.00");
+        BigDecimal newPrice = price.add(additionalAmount);
+
+        Map<String, Object> templateVariables = Map.of(
+                "rangeDate", date,
+                "nameCompany", busines.name(),
+                "companyLogo", busines.logoUrl(),
+                "nameCliente", user.name(),
+                "nit", user.nit(),
+                "servicio", service.name(),
+                "fecha",dateService,
+                "price", service.price(),
+                "total",newPrice
+
+        );
+        return this.downloadPdfService.downloadPdf("bill-download", templateVariables);
+    }
+
 }
