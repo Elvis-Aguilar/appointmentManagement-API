@@ -17,6 +17,7 @@ import com.appointment.management.domain.service.auth.TemplateRendererService;
 import com.appointment.management.domain.service.business.BusinessConfigurationService;
 import com.appointment.management.domain.service.business.ServiceService;
 import com.appointment.management.persistance.entity.AppointmentEntity;
+import com.appointment.management.persistance.entity.CancellationSurchargeEntity;
 import com.appointment.management.persistance.entity.ServiceEntity;
 import com.appointment.management.persistance.entity.UserEntity;
 import com.appointment.management.persistance.enums.StatusAppointment;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.mail.MailException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -59,12 +61,25 @@ class AppointmentServiceTest {
     @Mock
     private ServiceService serviceService;
 
+    @Mock
+    private CancellationSurchargeService cancellationSurchargeService;
+
+
     @InjectMocks
     private AppointmetnService appointmentService;
+
+    private AppointmentEntity appointmentEntity;
+    private UserEntity customer;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        customer = new UserEntity();
+        customer.setId(1L);
+        appointmentEntity = new AppointmentEntity();
+        appointmentEntity.setId(1L);
+        appointmentEntity.setCustomer(customer);
+        appointmentEntity.setStatus(StatusAppointment.CANCELED);
     }
 
     @Test
@@ -270,8 +285,62 @@ class AppointmentServiceTest {
         verify(appointmentRepository).findById(appointmentId);
     }
 
+    @Test
+    public void testStateCancelAppointment_Success() {
+        when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointmentEntity));
+        when(appointmentRepository.save(any(AppointmentEntity.class))).thenReturn(appointmentEntity);
+
+        AppointmentDto result = appointmentService.stateCancelAppointment(1L);
+
+        verify(appointmentRepository).save(appointmentEntity);
+    }
+
+    @Test
+    public void testStateCancelAppointment_AppointmentNotFound() {
+        when(appointmentRepository.findById(1L)).thenReturn(Optional.empty());
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            appointmentService.stateCancelAppointment(1L);
+        });
+
+        assertEquals("Appointment not found", exception.getMessage());
+    }
 
 
+    @Test
+    public void testCanceledAppointment_Success() throws Exception {
+        when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointmentEntity));
+        when(appointmentRepository.save(any(AppointmentEntity.class))).thenReturn(appointmentEntity);
+        when(userService.findUserByIdEntity(1L)).thenReturn(customer);
+        when(businessConfigurationService.findFirst()).thenReturn(new BusinessConfigurationDto("fadsf","fadfad"));
+        when(serviceService.getServiceById(any())).thenReturn(new ServiceDto(1L, "sgfg",new BigDecimal("5"),LocalTime.now(),"afdfdsf", 5,"sgdf","sgfg","sgfg"));
+        when(templateRendererService.renderTemplate(any(), any())).thenReturn("HTML Content");
+
+    }
+
+    @Test
+    public void testCanceledAppointment_AppointmentNotFound() {
+        when(appointmentRepository.findById(1L)).thenReturn(Optional.empty());
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            appointmentService.canceledAppointment(1L);
+        });
+
+        assertEquals("Appointment not found", exception.getMessage());
+    }
+
+    @Test
+    public void testCanceledAppointment_EmailSendingFailure() throws Exception {
+        when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointmentEntity));
+        when(appointmentRepository.save(any(AppointmentEntity.class))).thenReturn(appointmentEntity);
+        when(userService.findUserByIdEntity(1L)).thenReturn(customer);
+        when(businessConfigurationService.findFirst()).thenReturn(new BusinessConfigurationDto("fadfds","sgfgs"));
+        when(serviceService.getServiceById(any())).thenReturn(new ServiceDto(1L, "sgfg",new BigDecimal("5"),LocalTime.now(),"afdfdsf", 5,"sgdf","sgfg","sgfg"));
+        when(templateRendererService.renderTemplate(any(), any())).thenReturn("HTML Content");
+        doThrow(new MailException("Email error") {}).when(emailService).sendHtmlEmail(anyString(), anyString(), anyString(), anyString());
+
+
+    }
 
 
 }
