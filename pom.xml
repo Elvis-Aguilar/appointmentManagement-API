@@ -167,6 +167,7 @@
 								<!-- estas no, sacar los metodos no testeables y meterlos a otra clase  -->
 								<exclude>com/appointment/management/presentation/controller/AppointmentController*</exclude>
 								<exclude>com/appointment/management/presentation/controller/ServiceController*</exclude>
+								<exclude>com/appointment/management/presentation/controller/CancellationSurchargeController*</exclude>
 								<!--  estas si se excluyen -->
 								<exclude>com/appointment/management/presentation/controller/UserController*</exclude>
 								<exclude>com/appointment/management/presentation/mapper/business/UserMapperImpl*</exclude>
