@@ -133,4 +133,10 @@ public class AppointmentController {
         userObjects.add(dto.total());
         return this.downloadExcelService.generateExcelReport(headers, userObjects, "reporte_Citas", busines, "Reporte Citas", dto.filtro(), dto.rangeDate(), dto.items().size());
     }
+
+    @PatchMapping("/cancel/{id}")
+    public ResponseEntity<AppointmentDto> cancelAppointment(@PathVariable Long id) {
+        AppointmentDto canceledAppointment = appointmentService.stateCancelAppointment(id);
+        return ResponseEntity.ok(canceledAppointment);
+    }
 }

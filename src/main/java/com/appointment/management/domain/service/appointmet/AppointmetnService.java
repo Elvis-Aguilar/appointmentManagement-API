@@ -190,4 +190,20 @@ public class AppointmetnService {
         return appointmentMapper.toDto(updatedEntity);
 
     }
+
+    public AppointmentDto stateCancelAppointment(Long id) {
+        // Buscar la cita por su ID
+        AppointmentEntity existingAppointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
+
+        // Cambiar el estado de la cita a "CANCELED"
+        existingAppointment.setStatus(StatusAppointment.CANCELED);
+
+        // Guardar la cita actualizada en la base de datos
+        AppointmentEntity updatedEntity = appointmentRepository.save(existingAppointment);
+
+        // Retornar el DTO de la cita actualizada
+        return appointmentMapper.toDto(updatedEntity);
+    }
+
 }
