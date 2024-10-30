@@ -173,4 +173,9 @@ public class AppointmentController {
         return this.downloadPdfService.downloadPdf("bill-download", templateVariables);
     }
 
+    @PatchMapping("/cancel/{id}")
+    public ResponseEntity<AppointmentDto> cancelAppointment(@PathVariable Long id) {
+        AppointmentDto canceledAppointment = appointmentService.stateCancelAppointment(id);
+        return ResponseEntity.ok(canceledAppointment);
+    }
 }
