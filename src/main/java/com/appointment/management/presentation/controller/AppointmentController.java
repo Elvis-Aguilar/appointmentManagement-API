@@ -133,6 +133,4 @@ public class AppointmentController {
         userObjects.add(dto.total());
         return this.downloadExcelService.generateExcelReport(headers, userObjects, "reporte_Citas", busines, "Reporte Citas", dto.filtro(), dto.rangeDate(), dto.items().size());
     }
-
- 
 }
