@@ -71,15 +71,31 @@ public class UserService {
     }
 
     @Transactional
-    public UserWithGoogleSecretDto changeUserPassword(Long userId, String password, String repeatedPassword) {
+    public UserWithGoogleSecretDto changeUserPassword(Long userId, String currentPassword, String newPassword) {
+        // Busca al usuario por su ID
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new ValueNotFoundException("No se pudo encontrar los registros del usuario"));
 
-        String encryptedPassword = encoder.encode(password);
-        if (encoder.matches(repeatedPassword, encryptedPassword)) {
-            throw new BadRequestException("Las contraseñas no coinciden");
+        // Verifica que la contraseña actual ingresada coincida con la almacenada
+        if (!encoder.matches(currentPassword, user.getPassword())) {
+            throw new BadRequestException("La contraseña actual no es correcta");
         }
-        user.setPassword(encryptedPassword);
+
+        // Encripta la nueva contraseña y actualiza al usuario
+        user.setPassword(encoder.encode(newPassword));
+        UserEntity updatedUser = userRepository.save(user);
+
+        // Retorna el usuario actualizado en el formato deseado
+        return toUserForGoogleAuth(updatedUser);
+    }
+
+
+    public UserWithGoogleSecretDto changeUserPasswordRecover(Long userId, String password) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new ValueNotFoundException("No se pudo encontrar los registros del usuario"));
+
+        user.setPassword(encoder.encode(password));
+
         return toUserForGoogleAuth(userRepository.save(user));
     }
 
