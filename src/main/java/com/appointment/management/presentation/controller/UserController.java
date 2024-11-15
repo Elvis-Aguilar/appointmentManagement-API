@@ -3,10 +3,7 @@ package com.appointment.management.presentation.controller;
 import static java.util.function.Predicate.not;
 
 import com.appointment.management.application.exception.BadRequestException;
-import com.appointment.management.domain.dto.auth.GoogleAuthDto;
-import com.appointment.management.domain.dto.auth.GoogleAuthKeyDto;
-import com.appointment.management.domain.dto.auth.TokenDto;
-import com.appointment.management.domain.dto.auth.UserWithGoogleSecretDto;
+import com.appointment.management.domain.dto.auth.*;
 import com.appointment.management.domain.dto.user.PasswordChangeDto;
 import com.appointment.management.domain.dto.user.UserChangeDto;
 import com.appointment.management.domain.dto.user.UserDto;
@@ -88,11 +85,20 @@ public class UserController {
         return ResponseEntity.ok(addTokenToUserData(dbUser));
     }
 
+    @PutMapping("/change-password/{id}")
+    public ResponseEntity<TokenDto> changePasswordRecover(@PathVariable Long id,
+                                                   @RequestBody @Valid RecoverNewPassword user) {
+
+        UserWithGoogleSecretDto dbUser = userService.changeUserPasswordRecover(id, user.newPassword());
+
+        return ResponseEntity.ok(addTokenToUserData(dbUser));
+    }
+
     @PatchMapping("/{id}")
     public ResponseEntity<TokenDto> changePassword(@PathVariable Long id,
                                                    @RequestBody @Valid PasswordChangeDto user) {
 
-        UserWithGoogleSecretDto dbUser = userService.changeUserPassword(id, user.password(), user.repeatedPassword());
+        UserWithGoogleSecretDto dbUser = userService.changeUserPassword(id,  user.repeatedPassword(), user.password());
 
         return ResponseEntity.ok(addTokenToUserData(dbUser));
     }

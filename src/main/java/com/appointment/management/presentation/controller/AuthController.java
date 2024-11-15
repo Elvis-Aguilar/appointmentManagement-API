@@ -135,9 +135,10 @@ public class AuthController {
         String confirmationHtml = templateRendererService.renderTemplate("recover-password", templateVariables);
 
         try {
-            emailService.sendHtmlEmail("Appointment Management", dbUser.email(), "Recuperacion de contraseña en Cloudmerce",
+            emailService.sendHtmlEmail("Appointment-Management", dbUser.email(), "Recuperacion de contraseña en Appointment-Management",
                     confirmationHtml);
         } catch (MessagingException e) {
+            System.out.println(e.getMessage());
             throw new RequestConflictException("No se pudo enviar el correo para la recuperacion de contraseña");
         }
 
@@ -153,7 +154,7 @@ public class AuthController {
         }
 
         TokenDto token = userService.findUserWithGoogleKeyByEmail(user.email())
-                .map(this::addTemporalTokenToUserData)
+                .map(this::addAccessTokenToUserData)
                 .get();
 
         return ResponseEntity.ok(token);
