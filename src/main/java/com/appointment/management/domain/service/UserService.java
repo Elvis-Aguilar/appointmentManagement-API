@@ -117,6 +117,16 @@ public class UserService {
     }
 
     @Transactional
+    public UserDto deletedGoogleAuthentication(Long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new ValueNotFoundException("No se pudo encontrar los registros del usuario"));
+
+        user.setGoogleAuthKey(null);
+
+        return toUserDto(userRepository.save(user));
+    }
+
+    @Transactional
     public UserDto registerUser(SignUpDto user) {
         // Validar si el email ya está en uso
         if (userRepository.existsByEmail(user.email())) {

@@ -11,6 +11,7 @@ import com.appointment.management.domain.dto.user.UserProfileDto;
 import com.appointment.management.domain.service.UserService;
 import com.appointment.management.domain.service.auth.GoogleAuthService;
 import com.appointment.management.domain.service.auth.TokenService;
+import com.appointment.management.persistance.entity.UserEntity;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -69,6 +70,16 @@ public class UserController {
 
         return ResponseEntity.ok(user);
     }
+
+    @PatchMapping("/disable-a2f")
+    public ResponseEntity<UserDto> disableA2F(@NonNull HttpServletRequest request) {
+        long id = tokenService.getIdFromToken(request);
+
+        UserDto user = userService.deletedGoogleAuthentication(id);
+
+        return ResponseEntity.ok(user);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getMyInformation(@PathVariable Long id) {
         return ResponseEntity.of(userService.findUserById(id));
@@ -125,6 +136,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
     @GetMapping("/me")
     public ResponseEntity<UserDto> getMyInformation(@NonNull HttpServletRequest request) {
         long id = tokenService.getIdFromToken(request);
