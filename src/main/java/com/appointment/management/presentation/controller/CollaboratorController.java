@@ -71,6 +71,12 @@ public class CollaboratorController {
         return cartResponseService.responseSuccess(permissions, "User permissions", HttpStatus.OK);
     }
 
+    @GetMapping("/role/permissions/{userId}")
+    public ResponseEntity<Object> getPermissionsRoleByUserId(@PathVariable Long userId) {
+        List<PermissionDTO> permissions = collaboratorService.getRolePermissionsUserById(userId );
+        return cartResponseService.responseSuccess(permissions, "User permissions", HttpStatus.OK);
+    }
+
     @DeleteMapping("/{roleId}")
     public ResponseEntity<?> deletedRole(@PathVariable Long roleId) {
         this.collaboratorService.deletedRole(roleId);

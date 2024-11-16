@@ -125,6 +125,12 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsersWithRole(id));
     }
 
+    @GetMapping("/role-excluding")
+    public ResponseEntity<List<UserDto>> getUsersWithRoleExclusive() {
+        List<Long> excludedRoles = List.of(1L, 2L);
+        return ResponseEntity.ok(userService.getUsersExcludingRoles(excludedRoles));
+    }
+
     @PatchMapping("/prob/{userId}/role/{newRoleId}")
     public ResponseEntity<UserDto> changeUserRole(@PathVariable Long userId, @PathVariable Long newRoleId) {
         try {

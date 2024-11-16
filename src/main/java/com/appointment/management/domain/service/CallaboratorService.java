@@ -1,6 +1,7 @@
 package com.appointment.management.domain.service;
 
 import com.appointment.management.application.exception.RequestConflictException;
+import com.appointment.management.application.exception.ValueNotFoundException;
 import com.appointment.management.domain.dto.callaborator.CreateRoleDto;
 import com.appointment.management.domain.dto.callaborator.PermissionDTO;
 import com.appointment.management.domain.dto.callaborator.UserUpdateDTO;
@@ -156,6 +157,12 @@ public class CallaboratorService {
         return userPermissions.stream()
                 .map(userPermission -> convertToPermissionDTO(userPermission.getPermission()))
                 .collect(Collectors.toList());
+    }
+
+    public List<PermissionDTO> getRolePermissionsUserById(Long userId) {
+        UserEntity existingEntity = this.userRepository.findById(userId)
+                .orElseThrow(() -> new ValueNotFoundException("User not found with id: " + userId));
+        return this.getPermissionsRoleId(existingEntity.getRole().getId());
     }
 
     @Transactional
