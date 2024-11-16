@@ -106,6 +106,14 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public List<UserDto> getUsersExcludingRoles(List<Long> excludedRoleIds) {
+        List<UserEntity> users = userRepository.findAllByRoleIdNotIn(excludedRoleIds);
+        return users.stream()
+                .map(this::toUserDto)
+                .collect(Collectors.toList());
+    }
+
+
     @Transactional
     public UserDto addGoogleAuthentication(Long userId, String authKey) {
         UserEntity user = userRepository.findById(userId)

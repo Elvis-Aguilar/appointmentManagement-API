@@ -1,17 +1,15 @@
 package com.appointment.management.domain.service;
 
+import com.appointment.management.application.exception.RequestConflictException;
+import com.appointment.management.application.exception.ValueNotFoundException;
+import com.appointment.management.domain.dto.callaborator.CreateRoleDto;
 import com.appointment.management.domain.dto.callaborator.PermissionDTO;
 import com.appointment.management.domain.dto.callaborator.UserUpdateDTO;
 import com.appointment.management.domain.dto.user.UserDto;
-import com.appointment.management.persistance.entity.PermissionEntity;
-import com.appointment.management.persistance.entity.RoleEntity;
-import com.appointment.management.persistance.entity.UserEntity;
-import com.appointment.management.persistance.entity.UserPermissionEntity;
-import com.appointment.management.persistance.repository.PermissionRepository;
-import com.appointment.management.persistance.repository.RoleRepository;
-import com.appointment.management.persistance.repository.UserPermissionRepository;
-import com.appointment.management.persistance.repository.UserRepository;
+import com.appointment.management.persistance.entity.*;
+import com.appointment.management.persistance.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +27,8 @@ public class CallaboratorService {
     private final RoleRepository roleRepository;
 
     private final UserPermissionRepository userPermissionRepository;
+
+    private final RolePermissionRepository rolePermissionRepository;
 
     @Transactional
     public UserUpdateDTO updateUserPermissionRole(UserUpdateDTO updateDTO) {
@@ -57,6 +57,42 @@ public class CallaboratorService {
         return updateDTO;
     }
 
+    @Transactional
+    public void updateRolePermission(CreateRoleDto role, Long roleId) {
+        RoleEntity roleEntity = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("role not found"));
+
+        roleEntity.setName(role.name());
+        roleEntity.setDescription(role.description());
+        this.roleRepository.save(roleEntity);
+
+        //eliminar los permisos del rol
+        rolePermissionRepository.deleteAllByRoleId(roleId);
+
+        // Asignar nuevos permisos
+        for (Long permissionId : role.permissions()) {
+            PermissionEntity permission = permissionRepository.findById(permissionId)
+                    .orElseThrow(() -> new RuntimeException("Permission not found"));
+
+            RolePermissionEntity rolePermission = new RolePermissionEntity(roleEntity, permission);
+
+            rolePermissionRepository.save(rolePermission);
+        }
+    }
+
+    @Transactional
+    public CreateRoleDto createRolePermissions(CreateRoleDto createRoleDto, RoleEntity role) {
+        // Asignar nuevos permisos
+        for (Long permissionId : createRoleDto.permissions()) {
+            PermissionEntity permission = permissionRepository.findById(permissionId)
+                    .orElseThrow(() -> new RuntimeException("Permission not found"));
+
+            RolePermissionEntity rolePermission = new RolePermissionEntity(role, permission);
+
+            rolePermissionRepository.save(rolePermission);
+        }
+        return createRoleDto;
+    }
 
     public void updateUserRole(UserEntity user, Long newRoleId) {
 
@@ -112,5 +148,33 @@ public class CallaboratorService {
         return userPermissions.stream()
                 .map(userPermission -> convertToPermissionDTO(userPermission.getPermission()))
                 .collect(Collectors.toList());
+    }
+
+    public List<PermissionDTO> getPermissionsRoleId(Long roleId) {
+        List<RolePermissionEntity> userPermissions = this.rolePermissionRepository.findAllByRoleId(roleId);
+
+        // Convertir UserPermissionEntity a PermissionDTO
+        return userPermissions.stream()
+                .map(userPermission -> convertToPermissionDTO(userPermission.getPermission()))
+                .collect(Collectors.toList());
+    }
+
+    public List<PermissionDTO> getRolePermissionsUserById(Long userId) {
+        UserEntity existingEntity = this.userRepository.findById(userId)
+                .orElseThrow(() -> new ValueNotFoundException("User not found with id: " + userId));
+        return this.getPermissionsRoleId(existingEntity.getRole().getId());
+    }
+
+    @Transactional
+    public void deletedRole(Long roleId) {
+        // Eliminar todas las relaciones del rol con los permisos
+        rolePermissionRepository.deleteAllByRoleId(roleId);
+
+        // Eliminar el rol
+        try {
+            roleRepository.deleteById(roleId);
+        } catch (DataIntegrityViolationException e) {
+            throw new RequestConflictException("Failed to delete the role due to data integrity constraints.");
+        }
     }
 }
