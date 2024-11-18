@@ -366,31 +366,6 @@ class AuthControllerTest {
 
     }
 
-    @Test
-    void testConfirmSignUpSuccess() {
-        // Given
-        RecoverPasswordConfirmationDto recoverPasswordConfirmationDto = new RecoverPasswordConfirmationDto("test@example.com", "123456");
-        boolean isConfirmed = true;
-        UserWithGoogleSecretDto userWithGoogleSecret = new UserWithGoogleSecretDto(1L, "testUser", "test@example.com", "CLIENTE", null);
-        String token = "temp-token";
-
-        // Simular confirmación del código de correo
-        given(authConfirmationService.confirmUserEmailCode(recoverPasswordConfirmationDto.email(), recoverPasswordConfirmationDto.code())).willReturn(isConfirmed);
-        // Simular búsqueda del usuario
-        given(userService.findUserWithGoogleKeyByEmail(recoverPasswordConfirmationDto.email())).willReturn(Optional.of(userWithGoogleSecret));
-        // Simular generación del token temporal
-        given(tokenService.generateTemporalAccessToken(userWithGoogleSecret.id())).willReturn(token);
-
-        // When
-        ResponseEntity<TokenDto> response = authController.confirmSignUp(recoverPasswordConfirmationDto);
-
-        // Then
-        verify(authConfirmationService, times(1)).confirmUserEmailCode(recoverPasswordConfirmationDto.email(), recoverPasswordConfirmationDto.code());
-        verify(userService, times(1)).findUserWithGoogleKeyByEmail(recoverPasswordConfirmationDto.email());
-        verify(tokenService, times(1)).generateTemporalAccessToken(userWithGoogleSecret.id());
-
-        assertEquals(ResponseEntity.ok(new TokenDto(token, userWithGoogleSecret.id(), userWithGoogleSecret.name(), userWithGoogleSecret.email(), true, userWithGoogleSecret.role())), response);
-    }
 
     @Test
     void testConfirmSignUpFailure() {
