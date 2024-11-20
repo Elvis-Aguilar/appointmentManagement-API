@@ -38,7 +38,7 @@ public class CollaboratorController {
     }
 
     @PutMapping("/update-role/{roleId}")
-    public ResponseEntity<Object>updateRolePermission(@RequestBody CreateRoleDto role, @PathVariable Long roleId) {
+    public ResponseEntity<Object> updateRolePermission(@RequestBody CreateRoleDto role, @PathVariable Long roleId) {
         this.collaboratorService.updateRolePermission(role, roleId);
         return this.cartResponseService.responseSuccess(role,"all permission", HttpStatus.OK);
     }
