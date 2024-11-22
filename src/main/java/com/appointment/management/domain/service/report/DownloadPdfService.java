@@ -43,4 +43,16 @@ public class DownloadPdfService {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    public byte[]  generatePdf(String templateName, Map<String, Object> templateVariables){
+        String billHtml = templateRendererService.renderTemplate(templateName, templateVariables);
+        try {
+            byte[] pdfBytes = pdfService.generatePdfFromHtmlString(billHtml);
+
+            ByteArrayResource resource = new ByteArrayResource(pdfBytes);
+            return resource.getByteArray();
+        }catch (Exception e){
+            return null;
+        }
+    }
 }
