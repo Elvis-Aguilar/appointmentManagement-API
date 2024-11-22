@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -124,19 +125,21 @@ public class AppointmetnService {
         ServiceDto service = this.serviceService.getServiceById(existingAppointment.getService().getId());
         LocalDate dateService = existingAppointment.getStartDate().toLocalDate();
 
-        BigDecimal price = service.price();
-        BigDecimal additionalAmount = new BigDecimal("15.00");
+        String oter = updatedEntity.isFine() ? "Multa por cancelar fuera del tiempo permitido y mal uso de la aplicacion": "--";
+        BigDecimal fine = updatedEntity.isFine() ? busines.cancellationSurcharge() : new BigDecimal("0.00");
 
-        BigDecimal newPrice = price.add(additionalAmount);
-        Map<String, Object> templateVariables = Map.of(
-                "company", busines,
-                "order_date",date,
-                "client", user,
-                "servicio", service.name(),
-                "fecha",dateService,
-                "price", service.price(),
-                "priceTotal",newPrice
-        );
+        BigDecimal total = fine.add(service.price());
+
+        Map<String, Object> templateVariables = new HashMap<>();
+        templateVariables.put("company", busines);
+        templateVariables.put("order_date", date);
+        templateVariables.put("client", user);
+        templateVariables.put("servicio", service.name());
+        templateVariables.put("fecha", dateService);
+        templateVariables.put("price", service.price());
+        templateVariables.put("priceTotal", total);
+        templateVariables.put("oter", oter);
+        templateVariables.put("fine", fine);
 
         String confirmationHtml = templateRendererService.renderTemplate("bill", templateVariables);
 
@@ -156,6 +159,7 @@ public class AppointmetnService {
         AppointmentEntity existingAppointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
         existingAppointment.setStatus(StatusAppointment.CANCELED);
+        existingAppointment.setFine(true);
 
         AppointmentEntity updatedEntity = appointmentRepository.save(existingAppointment);
 

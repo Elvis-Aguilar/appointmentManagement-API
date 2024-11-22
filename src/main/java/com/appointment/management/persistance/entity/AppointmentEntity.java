@@ -54,6 +54,9 @@ public class AppointmentEntity {
     @Column(name = "payment_method", nullable = false)
     private PaymentMethod paymentMethod;
 
+    @Column(nullable = false)
+    private boolean fine = false;
+
     //manejo de relaciones con tablas hijas
     @OneToOne(mappedBy = "appointment")
     private InvoiceEntity invoice;

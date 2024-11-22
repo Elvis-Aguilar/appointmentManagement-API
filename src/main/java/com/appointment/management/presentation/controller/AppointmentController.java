@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -108,16 +109,16 @@ public class AppointmentController {
     public ResponseEntity<Resource> downloadReport(@RequestBody AppointmentReportDto appointmentReportDto) {
         BusinessConfigurationDto busines = this.businessConfigurationService.findFirst();
 
-        Map<String, Object> templateVariables = Map.of(
-                "items",appointmentReportDto.items(),
-                "total", appointmentReportDto.total(),
-                "size", appointmentReportDto.items().size(),
-                "filter", appointmentReportDto.filtro(),
-                "rangeDate", appointmentReportDto.rangeDate(),
-                "dateReport", LocalDate.now(),
-                "nameCompany", busines.name(),
-                "companyLogo", busines.logoUrl()
-        );
+        Map<String, Object> templateVariables = new HashMap<>();
+        templateVariables.put("items", appointmentReportDto.items());
+        templateVariables.put("total", appointmentReportDto.total());
+        templateVariables.put("size", appointmentReportDto.items().size());
+        templateVariables.put("filter", appointmentReportDto.filtro());
+        templateVariables.put("rangeDate", appointmentReportDto.rangeDate());
+        templateVariables.put("dateReport", LocalDate.now());
+        templateVariables.put("nameCompany", busines.name());
+        templateVariables.put("companyLogo", busines.logoUrl());
+
         return this.downloadPdfService.downloadPdf("report-appointment", templateVariables);
     }
 
@@ -160,22 +161,25 @@ public class AppointmentController {
         ServiceDto service = this.serviceService.getServiceById(appointmentDto.service());
         LocalDate dateService = appointmentDto.startDate().toLocalDate();
 
-        BigDecimal price = service.price();
-        BigDecimal additionalAmount = new BigDecimal("15.00");
-        BigDecimal newPrice = price.add(additionalAmount);
+        String oter = appointmentDto.fine() ? "Multa por cancelar fuera del tiempo permitido": "--";
 
-        Map<String, Object> templateVariables = Map.of(
-                "rangeDate", date,
-                "nameCompany", busines.name(),
-                "companyLogo", busines.logoUrl(),
-                "nameCliente", user.name(),
-                "nit", user.nit(),
-                "servicio", service.name(),
-                "fecha",dateService,
-                "price", service.price(),
-                "total",newPrice
+        BigDecimal fine = appointmentDto.fine() ? busines.cancellationSurcharge() : new BigDecimal("0.00");
 
-        );
+        BigDecimal total = fine.add(service.price());
+
+        Map<String, Object> templateVariables = new HashMap<>();
+        templateVariables.put("rangeDate", date);
+        templateVariables.put("nameCompany", busines.name());
+        templateVariables.put("companyLogo", busines.logoUrl());
+        templateVariables.put("nameCliente", user.name());
+        templateVariables.put("nit", user.nit());
+        templateVariables.put("servicio", service.name());
+        templateVariables.put("fecha", dateService);
+        templateVariables.put("price", service.price());
+        templateVariables.put("total", total);
+        templateVariables.put("oter", oter);
+        templateVariables.put("fine", fine);
+
         return this.downloadPdfService.downloadPdf("bill-download", templateVariables);
     }
 

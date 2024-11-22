@@ -49,7 +49,8 @@ public class AppointmentMapper {
                 entity.getStartDate(),
                 entity.getEndDate(),
                 entity.getStatus().name(),
-                entity.getPaymentMethod().name()
+                entity.getPaymentMethod().name(),
+                entity.isFine()
         );
     }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reporte de Citas</title>
+    <title>Factura de Citas</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -142,7 +142,6 @@
             <h3>Facturado A: <span th:text="${nameCliente}">---</span></h3>
             <p><strong>Nit: </strong> <span  th:text="${nit}">1</span></p>
             <p><strong>Cantidad :</strong> <span>1</span></p>
-            <p><strong>Impuestos: </strong><span>Q 15.00</span></p>
         </div>
 
         <div class="clearfix"></div>
@@ -168,6 +167,10 @@
             <td th:text="${fecha}">Q. 0.00</td>
             <td th:text="Q + ${price}">Q. 0.00</td>
             <td th:text="Q+ ${price}">Q. 0.00</td>
+        </tr>
+        <tr>
+            <th colspan="4">Otros :<strong th:text="${oter}">--</strong></th>
+            <th th:text="Q + ${fine}">Q 0.00</th>
         </tr>
         <tr>
             <th colspan="4">Total :</th>

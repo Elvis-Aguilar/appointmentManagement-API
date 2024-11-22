@@ -21,5 +21,6 @@ public record AppointmentDto(
         @NotBlank
         String status,
         @NotBlank
-        String paymentMethod
+        String paymentMethod,
+        boolean fine
 ) {}
