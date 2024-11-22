@@ -60,6 +60,12 @@ public class AppointmentController {
         return ResponseEntity.ok(appointments);
     }
 
+    @GetMapping("/employee/{id}")
+    public ResponseEntity<List<AppointmentDto>> getAllAppointments(@PathVariable Long id) {
+        List<AppointmentDto> appointments = appointmentService.getAllAppointmentsByEmployeeId(id);
+        return ResponseEntity.ok(appointments);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AppointmentDto> getAppointmentById(@PathVariable Long id) {
         return appointmentService.getAppointmentById(id)

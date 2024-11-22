@@ -62,6 +62,13 @@ public class AppointmetnService {
     }
 
     @Transactional(readOnly = true)
+    public List<AppointmentDto> getAllAppointmentsByEmployeeId(Long employeeId) {
+        return appointmentRepository.findByEmployeeId(employeeId).stream()
+                .map(appointmentMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public Optional<AppointmentDto> getAppointmentById(Long id) {
         return appointmentRepository.findById(id).map(appointmentMapper::toDto);
     }
