@@ -5,7 +5,6 @@ import com.appointment.management.domain.dto.business.UserHoursDto;
 import com.appointment.management.persistance.entity.BusinessHoursEntity;
 import com.appointment.management.persistance.entity.UserBusinessHoursEntity;
 import com.appointment.management.persistance.entity.UserEntity;
-import com.appointment.management.persistance.repository.AppointmentRepository;
 import com.appointment.management.persistance.repository.BusinessHoursRepository;
 import com.appointment.management.persistance.repository.UserBusinessHoursRepository;
 import com.appointment.management.persistance.repository.UserRepository;

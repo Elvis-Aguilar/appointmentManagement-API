@@ -66,7 +66,7 @@ class AppointmentMapperTest {
                 LocalDateTime.now(),
                 LocalDateTime.now().plusHours(1),
                 "RESERVED",
-                "CARD"
+                "CARD", false
         );
 
         appointmentEntity = new AppointmentEntity(

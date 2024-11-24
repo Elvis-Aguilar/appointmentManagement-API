@@ -86,7 +86,7 @@ class AppointmentServiceTest {
     void testGetAllAppointments() {
         // Given
         AppointmentEntity appointmentEntity = new AppointmentEntity();
-        AppointmentDto appointmentDto = new AppointmentDto(1L, 2L, 2L, 3L, LocalDateTime.now(), LocalDateTime.now(), "ffd", "fasdfas");
+        AppointmentDto appointmentDto = new AppointmentDto(1L, 2L, 2L, 3L, LocalDateTime.now(), LocalDateTime.now(), "ffd", "fasdfas", false);
 
         when(appointmentRepository.findAll()).thenReturn(List.of(appointmentEntity));
         when(appointmentMapper.toDto(appointmentEntity)).thenReturn(appointmentDto);
@@ -107,7 +107,7 @@ class AppointmentServiceTest {
         // Given
         Long appointmentId = 1L;
         AppointmentEntity appointmentEntity = new AppointmentEntity(); // Asigna valores según la entidad
-        AppointmentDto appointmentDto = new AppointmentDto(1L, 2L, 2L, 3L, LocalDateTime.now(), LocalDateTime.now(), "ffd", "fasdfas");
+        AppointmentDto appointmentDto = new AppointmentDto(1L, 2L, 2L, 3L, LocalDateTime.now(), LocalDateTime.now(), "ffd", "fasdfas", false);
 
         when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(appointmentEntity));
         when(appointmentMapper.toDto(appointmentEntity)).thenReturn(appointmentDto);
@@ -124,7 +124,7 @@ class AppointmentServiceTest {
     @Test
     void testCreateAppointment() {
         // Given
-        AppointmentDto appointmentDto = new AppointmentDto(1L, 2L, 2L, 3L, LocalDateTime.now(), LocalDateTime.now(), "ffd", "fasdfas");
+        AppointmentDto appointmentDto = new AppointmentDto(1L, 2L, 2L, 3L, LocalDateTime.now(), LocalDateTime.now(), "ffd", "fasdfas", false);
         AppointmentEntity appointmentEntity = new AppointmentEntity();
         AppointmentEntity savedEntity = new AppointmentEntity();
 
@@ -148,7 +148,7 @@ class AppointmentServiceTest {
     void testUpdateAppointment() {
         // Given
         Long appointmentId = 1L;
-        AppointmentDto appointmentDto = new AppointmentDto(1L, 2L, 2L, 3L, LocalDateTime.now(), LocalDateTime.now(), "ffd", "fasdfas");
+        AppointmentDto appointmentDto = new AppointmentDto(1L, 2L, 2L, 3L, LocalDateTime.now(), LocalDateTime.now(), "ffd", "fasdfas", false);
         AppointmentEntity existingAppointment = new AppointmentEntity(); // Asegúrate de inicializar la entidad según sea necesario
 
         when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(existingAppointment));

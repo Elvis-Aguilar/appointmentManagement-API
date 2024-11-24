@@ -64,7 +64,7 @@ class AppointmentControllerTest {
                 LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(1).plusHours(1),
                 "CONFIRMED",
-                "CREDIT_CARD"
+                "CREDIT_CARD", false
         );
     }
 
