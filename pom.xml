@@ -120,7 +120,6 @@
 			<version>2.6.0</version>
 		</dependency>
 		<!-- dependencias para gereracion de reports pdf, excel, png-->
-
 		<dependency>
 			<groupId>org.xhtmlrenderer</groupId>
 			<artifactId>flying-saucer-pdf</artifactId>
@@ -172,11 +171,7 @@
 						</goals>
 						<configuration>
 							<excludes>
-								<!-- estas no, sacar los metodos no testeables y meterlos a otra clase  -->
-								<exclude>com/appointment/management/presentation/controller/AppointmentController*</exclude>
-								<exclude>com/appointment/management/presentation/controller/ServiceController*</exclude>
-								<exclude>com/appointment/management/presentation/controller/CancellationSurchargeController*</exclude>
-								<!--  estas si se excluyen -->
+								<exclude>com/appointment/management/domain/service/report/DownloadReport*</exclude>
 								<exclude>com/appointment/management/presentation/controller/UserController*</exclude>
 								<exclude>com/appointment/management/presentation/mapper/business/UserMapperImpl*</exclude>
 								<exclude>com/appointment/management/domain/service/auth/TokenService*</exclude>

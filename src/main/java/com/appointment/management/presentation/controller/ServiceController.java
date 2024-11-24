@@ -40,9 +40,6 @@ import java.util.Map;
 public class ServiceController {
 
     private final ServiceService serviceService;
-    private final DownloadPdfService downloadPdfService;
-    private final BusinessConfigurationService businessConfigurationService;
-    private final DownloadExcelService downloadExcelService;
 
     @GetMapping
     public ResponseEntity<List<ServiceDto>> getAllServices() {
@@ -92,94 +89,4 @@ public class ServiceController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/downloadPDF")
-    public ResponseEntity<Resource> downloadReport(@RequestBody ServiceSendDto dto) {
-        BusinessConfigurationDto busines = this.businessConfigurationService.findFirst();
-
-        Map<String, Object> templateVariables = new HashMap<>();
-        templateVariables.put("items", dto.items());
-        templateVariables.put("total", dto.total());
-        templateVariables.put("size", dto.items().size());
-        templateVariables.put("filter", dto.filtro());
-        templateVariables.put("rangeDate", dto.rangeDate());
-        templateVariables.put("dateReport", LocalDate.now());
-        templateVariables.put("nameCompany", busines.name());
-        templateVariables.put("companyLogo", busines.logoUrl());
-
-        return this.downloadPdfService.downloadPdf("report-services", templateVariables);
-    }
-
-    @PostMapping("/downloadPNG")
-    public ResponseEntity<Resource> downloadReportPng(@RequestBody ServiceSendDto dto) {
-        BusinessConfigurationDto busines = this.businessConfigurationService.findFirst();
-
-        Map<String, Object> templateVariables = new HashMap<>();
-        templateVariables.put("items", dto.items());
-        templateVariables.put("total", dto.total());
-        templateVariables.put("size", dto.items().size());
-        templateVariables.put("filter", dto.filtro());
-        templateVariables.put("rangeDate", dto.rangeDate());
-        templateVariables.put("dateReport", LocalDate.now());
-        templateVariables.put("nameCompany", busines.name());
-        templateVariables.put("companyLogo", busines.logoUrl());
-
-        // Renderiza el PDF
-        byte[] pdfBytes = this.downloadPdfService.generatePdf("report-services", templateVariables);
-
-        // Convierte el PDF a PNG
-        ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
-        convertPdfToPng(pdfBytes, pngOutputStream);
-
-        // Devuelve el archivo PNG como respuesta
-        ByteArrayResource resource = new ByteArrayResource(pngOutputStream.toByteArray());
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_PNG)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"report.png\"")
-                .body(resource);
-    }
-
-    // Método para convertir un PDF a PNG
-    private void convertPdfToPng(byte[] pdfBytes, ByteArrayOutputStream outputStream) {
-        try (PDDocument document =  Loader.loadPDF(pdfBytes)) { // Carga el PDF desde los bytes
-            PDFRenderer pdfRenderer = new PDFRenderer(document);
-
-            // Renderiza la página 0 con una resolución de 300 DPI
-            BufferedImage bufferedImage = pdfRenderer.renderImageWithDPI(0, 300);
-
-            // Escribe la imagen como PNG en el outputStream
-            ImageIO.write(bufferedImage, "PNG", outputStream);
-        } catch (IOException e) {
-            throw new RuntimeException("Error al convertir PDF a PNG", e);
-        }
-    }
-
-
-    @PostMapping("/download-excel")
-    ResponseEntity<byte[]>downloadReportExcel(@RequestBody ServiceSendDto dto)throws IOException {
-        BusinessConfigurationDto busines = this.businessConfigurationService.findFirst();
-        List<ServiceItemDto> items = dto.items();
-        List<String> headers = new ArrayList<>();
-        headers.add("Nombre");
-        headers.add("Descripcion");
-        headers.add("Duracion (H)");
-        headers.add("Estado");
-        headers.add("Precio Q");
-        headers.add("Citas");
-        List<Object> userObjects = new ArrayList<>();
-        for (ServiceItemDto item : items) {
-            userObjects.add(item.name() == null ? "" : item.name());
-            userObjects.add(item.description() == null ? "" : item.description());
-            userObjects.add(item.duration() == null ? "" : item.duration() );
-            userObjects.add(item.status() == null ? "" : item.status());
-            userObjects.add(item.price() == null ? "" : item.price());
-            userObjects.add(item.citas() == null ? "" : item.citas());
-        }
-        userObjects.add("Total General");
-        userObjects.add("");
-        userObjects.add("");
-        userObjects.add("");
-        userObjects.add("");
-        userObjects.add(dto.total());
-        return this.downloadExcelService.generateExcelReport(headers, userObjects, "reporte_Servicios", busines, "Reporte Servicios", dto.filtro(), dto.rangeDate(), dto.items().size());
-    }
 }
