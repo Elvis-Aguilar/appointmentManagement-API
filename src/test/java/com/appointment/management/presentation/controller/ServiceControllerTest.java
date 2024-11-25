@@ -31,6 +31,7 @@ class ServiceControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
+        //Given Global
         serviceDto = new ServiceDto(
                 1L,
                 "Test Service",
@@ -47,13 +48,13 @@ class ServiceControllerTest {
 
     @Test
     void getAllServices_ShouldReturnListOfServices() {
-        // Arrange
+        // Given
         when(serviceService.getAllServices()).thenReturn(List.of(serviceDto));
 
-        // Act
+        // When
         ResponseEntity<List<ServiceDto>> response = serviceController.getAllServices();
 
-        // Assert
+        // Then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, response.getBody().size());
         verify(serviceService, times(1)).getAllServices();
@@ -61,13 +62,13 @@ class ServiceControllerTest {
 
     @Test
     void getAvailableServices_ShouldReturnListOfAvailableServices() {
-        // Arrange
+        // Given
         when(serviceService.getAllServicesAvailable()).thenReturn(List.of(serviceDto));
 
-        // Act
+        // When
         ResponseEntity<List<ServiceDto>> response = serviceController.getAvailableServices();
 
-        // Assert
+        // Then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, response.getBody().size());
         verify(serviceService, times(1)).getAllServicesAvailable();
@@ -75,13 +76,13 @@ class ServiceControllerTest {
 
     @Test
     void getUnavailableServices_ShouldReturnListOfUnavailableServices() {
-        // Arrange
+        // Given
         when(serviceService.getAllServicesUnavailable()).thenReturn(List.of(serviceDto));
 
-        // Act
+        // When
         ResponseEntity<List<ServiceDto>> response = serviceController.getUnavailableServices();
 
-        // Assert
+        // Then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, response.getBody().size());
         verify(serviceService, times(1)).getAllServicesUnavailable();
@@ -89,14 +90,14 @@ class ServiceControllerTest {
 
     @Test
     void getServiceById_ShouldReturnServiceDto_WhenServiceExists() {
-        // Arrange
+        // Given
         Long id = 1L;
         when(serviceService.getServiceById(id)).thenReturn(serviceDto);
 
-        // Act
+        // When
         ResponseEntity<ServiceDto> response = serviceController.getServiceById(id);
 
-        // Assert
+        // Then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(serviceDto, response.getBody());
         verify(serviceService, times(1)).getServiceById(id);
@@ -104,13 +105,13 @@ class ServiceControllerTest {
 
     @Test
     void createService_ShouldReturnCreatedService() {
-        // Arrange
+        // Given
         when(serviceService.createService(any(ServiceDto.class))).thenReturn(serviceDto);
 
-        // Act
+        // When
         ResponseEntity<ServiceDto> response = serviceController.createService(serviceDto);
 
-        // Assert
+        // Then
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(serviceDto, response.getBody());
         verify(serviceService, times(1)).createService(any(ServiceDto.class));
@@ -118,14 +119,14 @@ class ServiceControllerTest {
 
     @Test
     void updateService_ShouldReturnUpdatedService() {
-        // Arrange
+        // Given
         Long id = 1L;
         when(serviceService.updateService(eq(id), any(ServiceDto.class))).thenReturn(serviceDto);
 
-        // Act
+        // When
         ResponseEntity<ServiceDto> response = serviceController.updateService(id, serviceDto);
 
-        // Assert
+        // Then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(serviceDto, response.getBody());
         verify(serviceService, times(1)).updateService(eq(id), any(ServiceDto.class));
@@ -133,15 +134,15 @@ class ServiceControllerTest {
 
     @Test
     void updateServiceStatus_ShouldReturnUpdatedService() {
-        // Arrange
+        // Given
         Long id = 1L;
         String status = "unavailable";
         when(serviceService.updateServiceStatus(id, status)).thenReturn(serviceDto);
 
-        // Act
+        // When
         ResponseEntity<ServiceDto> response = serviceController.updateServiceStatus(id, status);
 
-        // Assert
+        // Then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(serviceDto, response.getBody());
         verify(serviceService, times(1)).updateServiceStatus(id, status);
@@ -149,14 +150,14 @@ class ServiceControllerTest {
 
     @Test
     void deleteService_ShouldReturnNoContent() {
-        // Arrange
+        // Given
         Long id = 1L;
         doNothing().when(serviceService).deleteService(id);
 
-        // Act
+        // When
         ResponseEntity<Void> response = serviceController.deleteService(id);
 
-        // Assert
+        // Then
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(serviceService, times(1)).deleteService(id);
     }

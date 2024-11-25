@@ -36,6 +36,7 @@ class ServiceServiceTest {
     @InjectMocks
     private ServiceService serviceService;
 
+    //Variable globales para el Given Global
     private ServiceEntity serviceEntity;
     private ServiceDto serviceDto;
     private ServiceDto serviceDto1;
@@ -44,6 +45,7 @@ class ServiceServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
+        //Given Global
         this.serviceDto = new ServiceDto(1L,"Corete de Cabello",
                 BigDecimal.valueOf(100.00), LocalTime.of(9, 0),
                 "description",4,"zona 0","fadfafadf","AVAILABLE");
@@ -52,6 +54,7 @@ class ServiceServiceTest {
                 BigDecimal.valueOf(100.00), LocalTime.of(9, 0),
                 "description",4,"zona 0","fadfafadf","UNAVAILABLE");
 
+        //Given Global
         serviceEntity = new ServiceEntity();
         serviceEntity.setId(1L);
         serviceEntity.setName("Corete de Cabello");
@@ -61,12 +64,14 @@ class ServiceServiceTest {
     /*test para getAllServices*/
     @Test
     void shouldReturnAllServicesSuccessfully() {
+        //When
         when(serviceRepository.findAll()).thenReturn(List.of(serviceEntity));
-
         when(serviceMapper.toDto(serviceEntity)).thenReturn(serviceDto);
 
+        //Llamando a la funcion a testear
         List<ServiceDto> result = serviceService.getAllServices();
 
+        //Then
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(serviceDto, result.getFirst());
@@ -77,19 +82,22 @@ class ServiceServiceTest {
 
     @Test
     void shouldReturnEmptyListWhenNoServicesFound() {
+        //When
         when(serviceRepository.findAll()).thenReturn(Collections.emptyList());
 
+        //Llamando a la funcion a testear
         List<ServiceDto> result = serviceService.getAllServices();
 
+        //Then
         assertNotNull(result);
         assertTrue(result.isEmpty());
-
         verify(serviceRepository, times(1)).findAll();
         verify(serviceMapper, never()).toDto(any(ServiceEntity.class));
     }
 
     @Test
     void shouldHandleMultipleServices() {
+        //Given
         ServiceEntity secondServiceEntity = new ServiceEntity();
         secondServiceEntity.setId(2L);
         secondServiceEntity.setName("Corte de Barba");
@@ -106,18 +114,19 @@ class ServiceServiceTest {
                 "AVAILABLE"
         );
 
+        //When
         when(serviceRepository.findAll()).thenReturn(List.of(serviceEntity, secondServiceEntity));
-
         when(serviceMapper.toDto(serviceEntity)).thenReturn(serviceDto);
         when(serviceMapper.toDto(secondServiceEntity)).thenReturn(secondServiceDto);
 
+        //Llamando a la funcion a testear
         List<ServiceDto> result = serviceService.getAllServices();
 
+        //Then
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals(serviceDto, result.get(0));
         assertEquals(secondServiceDto, result.get(1));
-
         verify(serviceRepository, times(1)).findAll();
         verify(serviceMapper, times(1)).toDto(serviceEntity);
         verify(serviceMapper, times(1)).toDto(secondServiceEntity);
@@ -126,13 +135,17 @@ class ServiceServiceTest {
     /*Test para getAllServicesAvailable*/
     @Test
     void shouldReturnServicesAvailableSuccessfully() {
+        //Given
         this.serviceEntity.setStatus(StatusBusinessHours.AVAILABLE);
-        when(serviceRepository.findAllByStatus(StatusBusinessHours.AVAILABLE)).thenReturn(List.of(serviceEntity));
 
+        //When
+        when(serviceRepository.findAllByStatus(StatusBusinessHours.AVAILABLE)).thenReturn(List.of(serviceEntity));
         when(serviceMapper.toDto(serviceEntity)).thenReturn(serviceDto);
 
+        //Llamando a la funcion a testear
         List<ServiceDto> result = serviceService.getAllServicesAvailable();
 
+        //Then
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(serviceDto, result.getFirst());
@@ -144,19 +157,22 @@ class ServiceServiceTest {
 
     @Test
     void shouldReturnEmptyListWhenNoServicesAvailableFound() {
+        //When
         when(serviceRepository.findAllByStatus(StatusBusinessHours.AVAILABLE)).thenReturn(Collections.emptyList());
 
+        //Llamando a la funcion a testear
         List<ServiceDto> result = serviceService.getAllServicesAvailable();
 
+        //Then
         assertNotNull(result);
         assertTrue(result.isEmpty());
-
         verify(serviceRepository, times(1)).findAllByStatus(StatusBusinessHours.AVAILABLE);
         verify(serviceMapper, never()).toDto(any(ServiceEntity.class));
     }
 
     @Test
     void shouldHandleMultipleServicesAvailable() {
+        //Given
         ServiceEntity secondServiceEntity = new ServiceEntity();
         secondServiceEntity.setId(2L);
         secondServiceEntity.setName("Corte de Barba");
@@ -173,13 +189,15 @@ class ServiceServiceTest {
                 "AVAILABLE"
         );
 
+        //When
         when(serviceRepository.findAllByStatus(StatusBusinessHours.AVAILABLE)).thenReturn(List.of(serviceEntity, secondServiceEntity));
-
         when(serviceMapper.toDto(serviceEntity)).thenReturn(serviceDto);
         when(serviceMapper.toDto(secondServiceEntity)).thenReturn(secondServiceDto);
 
+        //Llamando a la funcion a testear
         List<ServiceDto> result = serviceService.getAllServicesAvailable();
 
+        //Then
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals(serviceDto, result.get(0));
@@ -194,13 +212,14 @@ class ServiceServiceTest {
     @Test
     void shouldReturnServicesUnavailableSuccessfully() {
 
-
+        //When
         when(serviceRepository.findAllByStatus(StatusBusinessHours.UNAVAILABLE)).thenReturn(List.of(serviceEntity));
-
         when(serviceMapper.toDto(serviceEntity)).thenReturn(serviceDto1);
 
+        //Llamando a la funcion a testear
         List<ServiceDto> result = serviceService.getAllServicesUnavailable();
 
+        //Then
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(serviceDto1.id(), result.getFirst().id());
@@ -212,19 +231,22 @@ class ServiceServiceTest {
 
     @Test
     void shouldReturnEmptyListWhenNoServicesUnavailableFound() {
+        //When
         when(serviceRepository.findAllByStatus(StatusBusinessHours.UNAVAILABLE)).thenReturn(Collections.emptyList());
 
+        //Llamando a la funcion a testear
         List<ServiceDto> result = serviceService.getAllServicesUnavailable();
 
+        //Then
         assertNotNull(result);
         assertTrue(result.isEmpty());
-
         verify(serviceRepository, times(1)).findAllByStatus(StatusBusinessHours.UNAVAILABLE);
         verify(serviceMapper, never()).toDto(any(ServiceEntity.class));
     }
 
     @Test
     void shouldHandleMultipleServicesUnavailable() {
+        //Given
         ServiceEntity secondServiceEntity = new ServiceEntity();
         secondServiceEntity.setId(2L);
         secondServiceEntity.setName("Corte de Barba");
@@ -241,13 +263,15 @@ class ServiceServiceTest {
                 "UNAVAILABLE"
         );
 
+        //When
         when(serviceRepository.findAllByStatus(StatusBusinessHours.UNAVAILABLE)).thenReturn(List.of(serviceEntity, secondServiceEntity));
-
         when(serviceMapper.toDto(serviceEntity)).thenReturn(serviceDto1);
         when(serviceMapper.toDto(secondServiceEntity)).thenReturn(secondServiceDto);
 
+        //Llamando a la funcion a testear
         List<ServiceDto> result = serviceService.getAllServicesUnavailable();
 
+        //Then
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals(serviceDto1, result.get(0));
@@ -261,12 +285,14 @@ class ServiceServiceTest {
     /*test para getServiceById*/
     @Test
     void shouldReturnServiceByIdSuccessfully() {
+        //When
         when(serviceRepository.findById(1L)).thenReturn(Optional.of(serviceEntity));
-
         when(serviceMapper.toDto(serviceEntity)).thenReturn(serviceDto);
 
+        //Llamando a la funcion a testear
         ServiceDto result = serviceService.getServiceById(1L);
 
+        //Then
         assertNotNull(result);
         assertEquals(serviceDto, result);
 
@@ -276,14 +302,16 @@ class ServiceServiceTest {
 
     @Test
     void shouldThrowExceptionWhenServiceNotFound() {
+
+        //When
         when(serviceRepository.findById(1L)).thenReturn(Optional.empty());
 
         ValueNotFoundException exception = assertThrows(ValueNotFoundException.class, () -> {
             serviceService.getServiceById(1L);
         });
 
+        //Then
         assertEquals("Service not found with id: 1", exception.getMessage());
-
         verify(serviceRepository, times(1)).findById(1L);
         verify(serviceMapper, never()).toDto(any(ServiceEntity.class));
     }
@@ -291,15 +319,17 @@ class ServiceServiceTest {
     /*test para createService*/
     @Test
     void shouldCreateServiceSuccessfully() {
+        //When
         when(serviceMapper.toEntity(serviceDto)).thenReturn(serviceEntity);
         when(serviceRepository.save(serviceEntity)).thenReturn(serviceEntity);
         when(serviceMapper.toDto(serviceEntity)).thenReturn(serviceDto);
 
+        //Llamando a la funcion a testear
         ServiceDto result = serviceService.createService(serviceDto);
 
+        //Then
         assertNotNull(result);
         assertEquals(serviceDto, result);
-
         verify(serviceMapper, times(1)).toEntity(serviceDto);
         verify(serviceRepository, times(1)).save(serviceEntity);
         verify(serviceMapper, times(1)).toDto(serviceEntity);
@@ -307,6 +337,7 @@ class ServiceServiceTest {
 
     @Test
     void shouldThrowExceptionWhenSavingFails() {
+        //When
         when(serviceMapper.toEntity(serviceDto)).thenReturn(serviceEntity);
         when(serviceRepository.save(serviceEntity)).thenThrow(new RuntimeException("Error al guardar"));
 
@@ -314,8 +345,8 @@ class ServiceServiceTest {
             serviceService.createService(serviceDto);
         });
 
+        //Then
         assertEquals("Error al guardar", exception.getMessage());
-
         verify(serviceMapper, times(1)).toEntity(serviceDto);
         verify(serviceRepository, times(1)).save(serviceEntity);
         verify(serviceMapper, never()).toDto(any(ServiceEntity.class));
@@ -324,16 +355,18 @@ class ServiceServiceTest {
     /*test para updateService*/
     @Test
     void shouldUpdateServiceSuccessfully() {
+        //When
         when(serviceRepository.findById(1L)).thenReturn(Optional.of(serviceEntity));
         doNothing().when(serviceMapper).updateEntityFromDto(serviceDto, serviceEntity);
         when(serviceRepository.save(serviceEntity)).thenReturn(serviceEntity);
         when(serviceMapper.toDto(serviceEntity)).thenReturn(serviceDto);
 
+        //Llamando a la funcion a testear
         ServiceDto result = serviceService.updateService(1L, serviceDto);
 
+        //Then
         assertNotNull(result);
         assertEquals(serviceDto, result);
-
         verify(serviceRepository, times(1)).findById(1L);
         verify(serviceMapper, times(1)).updateEntityFromDto(serviceDto, serviceEntity);
         verify(serviceRepository, times(1)).save(serviceEntity);
@@ -342,30 +375,33 @@ class ServiceServiceTest {
 
     @Test
     void shouldThrowExceptionWhenUpdateServiceNotFound() {
+        //When
         when(serviceRepository.findById(1L)).thenReturn(Optional.empty());
 
         ValueNotFoundException exception = assertThrows(ValueNotFoundException.class, () -> {
             serviceService.updateService(1L, serviceDto);
         });
 
+        //Then
         assertEquals("Service not found with id: 1", exception.getMessage());
-
         verify(serviceMapper, never()).updateEntityFromDto(any(ServiceDto.class), any(ServiceEntity.class));
         verify(serviceRepository, never()).save(any(ServiceEntity.class));
     }
 
     @Test
     void shouldHandleErrorWhenSavingFails() {
+        //When
         when(serviceRepository.findById(1L)).thenReturn(Optional.of(serviceEntity));
         doNothing().when(serviceMapper).updateEntityFromDto(serviceDto, serviceEntity);
         when(serviceRepository.save(serviceEntity)).thenThrow(new RuntimeException("Error al actualizar"));
 
+        //Llamando a la funcion a testear
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             serviceService.updateService(1L, serviceDto);
         });
 
+        //Then
         assertEquals("Error al actualizar", exception.getMessage());
-
         verify(serviceRepository, times(1)).findById(1L);
         verify(serviceMapper, times(1)).updateEntityFromDto(serviceDto, serviceEntity);
         verify(serviceRepository, times(1)).save(serviceEntity);
@@ -374,15 +410,17 @@ class ServiceServiceTest {
     /*test para updateServiceStatus*/
     @Test
     void shouldUpdateServiceStatusSuccessfully() {
+        //When
         when(serviceRepository.findById(1L)).thenReturn(Optional.of(serviceEntity));
         when(serviceRepository.save(serviceEntity)).thenReturn(serviceEntity);
         when(serviceMapper.toDto(serviceEntity)).thenReturn(serviceDto);
 
+        //Llamando a la funcion a testear
         ServiceDto result = serviceService.updateServiceStatus(1L, "UNAVAILABLE");
 
+        //Then
         assertNotNull(result);
         assertEquals("UNAVAILABLE", serviceEntity.getStatus().name());
-
         verify(serviceRepository, times(1)).findById(1L);
         verify(serviceRepository, times(1)).save(serviceEntity);
         verify(serviceMapper, times(1)).toDto(serviceEntity);
@@ -390,41 +428,47 @@ class ServiceServiceTest {
 
     @Test
     void shouldThrowExceptionWhenUpdateStatsServiceNotFound() {
+        //When
         when(serviceRepository.findById(1L)).thenReturn(Optional.empty());
 
+        //Llamando a la funcion a testear
         ValueNotFoundException exception = assertThrows(ValueNotFoundException.class, () -> {
             serviceService.updateServiceStatus(1L, "AVAILABLE");
         });
 
+        //Then
         assertEquals("Service not found with id: 1", exception.getMessage());
-
         verify(serviceRepository, never()).save(any(ServiceEntity.class));
     }
 
     @Test
     void shouldThrowExceptionForInvalidStatus() {
+        //When
         when(serviceRepository.findById(1L)).thenReturn(Optional.of(serviceEntity));
 
+        //Llamando a la funcion a testear
         BadRequestException exception = assertThrows(BadRequestException.class, () -> {
             serviceService.updateServiceStatus(1L, "INVALID_STATUS");
         });
 
+        //Then
         assertEquals("Invalid status value: INVALID_STATUS", exception.getMessage());
-
         verify(serviceRepository, never()).save(any(ServiceEntity.class));
     }
 
     @Test
     void shouldHandleErrorWhenSavingFailsUpdateServiceStatus() {
+        //When
         when(serviceRepository.findById(1L)).thenReturn(Optional.of(serviceEntity));
         when(serviceRepository.save(serviceEntity)).thenThrow(new RuntimeException("Error al actualizar estado"));
 
+        //Llamando a la funcion a testear
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             serviceService.updateServiceStatus(1L, "AVAILABLE");
         });
 
+        //Then
         assertEquals("Error al actualizar estado", exception.getMessage());
-
         verify(serviceRepository, times(1)).findById(1L);
         verify(serviceRepository, times(1)).save(serviceEntity);
     }
@@ -433,10 +477,13 @@ class ServiceServiceTest {
 
     @Test
     void shouldSoftDeleteServiceSuccessfully() {
+        //When
         when(serviceRepository.findById(1L)).thenReturn(Optional.of(serviceEntity));
 
+        //Llamando a la funcion a testear
         serviceService.deleteService(1L);
 
+        //Then
         assertEquals(StatusBusinessHours.DELETED, serviceEntity.getStatus());
         verify(serviceRepository, times(1)).findById(1L);
         verify(serviceRepository, times(1)).save(serviceEntity);
@@ -444,28 +491,32 @@ class ServiceServiceTest {
 
     @Test
     void shouldThrowExceptionWhenServiceDeleteNotFound() {
+        //When
         when(serviceRepository.findById(1L)).thenReturn(Optional.empty());
 
+        //Llamando a la funcion a testear
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
             serviceService.deleteService(1L);
         });
 
+        //Then
         assertEquals("Service not found with id: 1", exception.getMessage());
-
         verify(serviceRepository, never()).save(any(ServiceEntity.class));
     }
 
     @Test
     void shouldHandleErrorWhenSavingFailsDelete() {
+        //When
         when(serviceRepository.findById(1L)).thenReturn(Optional.of(serviceEntity));
         doThrow(new RuntimeException("Error al guardar")).when(serviceRepository).save(serviceEntity);
 
+        //Llamando a la funcion a testear
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             serviceService.deleteService(1L);
         });
 
+        //Then
         assertEquals("Error al guardar", exception.getMessage());
-
         verify(serviceRepository, times(1)).findById(1L);
         verify(serviceRepository, times(1)).save(serviceEntity);
     }

@@ -33,13 +33,16 @@ class EmployeeAvailabilityMapperImplTest {
 
     @Test
     void shouldReturnNullWhenDtoIsNull() {
+        // When
         EmployeeAvailabilityEntity result = employeeAvailabilityMapperImpl.toEntity(null);
 
+        //Then
         assertNull(result);
     }
 
     @Test
     void shouldMapDtoToEntitySuccessfully() {
+        // Given
         Long employeeId = 1L;
         UserEntity mockUser = new UserEntity();
         mockUser.setId(employeeId);
@@ -53,10 +56,13 @@ class EmployeeAvailabilityMapperImplTest {
                 null
         );
 
+        // When
         when(userMapperHelper.findById(employeeId)).thenReturn(mockUser);
 
+        // Ejecucion del metodo a testear
         EmployeeAvailabilityEntity result = employeeAvailabilityMapperImpl.toEntity(dto);
 
+        // Then
         assertNotNull(result);
         assertEquals(dto.id(), result.getId());
         assertEquals(mockUser, result.getEmployee());
@@ -67,6 +73,8 @@ class EmployeeAvailabilityMapperImplTest {
 
     @Test
     void shouldThrowExceptionWhenEmployeeNotFound() {
+
+        // Given
         Long employeeId = 1L;
         EmployeeAvailabilityDto dto = new EmployeeAvailabilityDto(
                 1L,
@@ -77,16 +85,21 @@ class EmployeeAvailabilityMapperImplTest {
                 null
         );
 
+        //When
         when(userMapperHelper.findById(employeeId)).thenReturn(null);
 
+        // Ejecucion del metodo a testear
         BadRequestException exception = assertThrows(BadRequestException.class, () -> {
             employeeAvailabilityMapperImpl.toEntity(dto);
         });
+
+        //Then
         assertEquals("Admin not found with id: 1", exception.getMessage());
     }
 
     @Test
     void shouldThrowExceptionWhenDayOfWeekIsInvalid() {
+        // Given
         Long employeeId = 1L;
         UserEntity mockUser = new UserEntity();
         mockUser.setId(employeeId);
@@ -100,11 +113,15 @@ class EmployeeAvailabilityMapperImplTest {
                 null
         );
 
+        // When
         when(userMapperHelper.findById(employeeId)).thenReturn(mockUser);
 
+        // Ejecucion del metodo a testear
         BadRequestException exception = assertThrows(BadRequestException.class, () -> {
             employeeAvailabilityMapperImpl.toEntity(dto);
         });
+
+        // Then
         assertEquals("Invalid Day Week: INVALID_DAY", exception.getMessage());
     }
 

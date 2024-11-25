@@ -48,16 +48,14 @@ class AppointmentMapperTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-
-        RoleEntity customerRole = new RoleEntity();
-        RoleEntity employeeRole = new RoleEntity();
-
+        //Given Global
         customer = new UserEntity();
         customer.setId(1L);
         employee = new UserEntity();
         employee.setId(2L);
         service = new ServiceEntity("Service", BigDecimal.valueOf(100), LocalTime.of(1, 0), "Description");
 
+        //Given
         appointmentDto = new AppointmentDto(
                 1L,
                 customer.getId(),
@@ -69,6 +67,7 @@ class AppointmentMapperTest {
                 "CARD", false
         );
 
+        //Given
         appointmentEntity = new AppointmentEntity(
                 customer,
                 service,
@@ -82,26 +81,32 @@ class AppointmentMapperTest {
 
     @Test
     void toEntity_ShouldThrowException_WhenCustomerIsNotFound() {
+        //When
         when(userRepository.findById(customer.getId())).thenReturn(Optional.empty());
         when(serviceRepository.findById(service.getId())).thenReturn(Optional.of(service));
         when(userRepository.findById(employee.getId())).thenReturn(Optional.of(employee));
 
+        //Then
         assertThrows(AssertionError.class, () -> appointmentMapper.toEntity(appointmentDto));
     }
 
     @Test
     void toEntity_ShouldThrowException_WhenServiceIsNotFound() {
+        // When
         when(userRepository.findById(customer.getId())).thenReturn(Optional.of(customer));
         when(serviceRepository.findById(service.getId())).thenReturn(Optional.empty());
         when(userRepository.findById(employee.getId())).thenReturn(Optional.of(employee));
 
+        // Then
         assertThrows(AssertionError.class, () -> appointmentMapper.toEntity(appointmentDto));
     }
 
     @Test
     void toDto_ShouldReturnDto_WhenEntityIsValid() {
+        //Given
         AppointmentDto result = appointmentMapper.toDto(appointmentEntity);
 
+        //Then
         assertNotNull(result);
         assertEquals(appointmentEntity.getId(), result.id());
         assertEquals(appointmentEntity.getStartDate(), result.startDate());
@@ -112,8 +117,10 @@ class AppointmentMapperTest {
 
     @Test
     void updateEntityFromDto_ShouldUpdateEntityFields() {
+        //Given
         appointmentMapper.updateEntityFromDto(appointmentDto, appointmentEntity);
 
+        // Then
         assertEquals(appointmentDto.startDate(), appointmentEntity.getStartDate());
         assertEquals(appointmentDto.endDate(), appointmentEntity.getEndDate());
         assertEquals(StatusAppointment.valueOf(appointmentDto.status()), appointmentEntity.getStatus());
@@ -122,12 +129,16 @@ class AppointmentMapperTest {
 
     @Test
     void toEntity_ShouldReturnEntity_WhenDtoIsValid() {
+
+        // When
         when(userRepository.findById(customer.getId())).thenReturn(Optional.of(customer));
         when(userRepository.findById(employee.getId())).thenReturn(Optional.of(employee));
         when(serviceRepository.findById(service.getId())).thenReturn(Optional.of(service));
 
+        //Ejecutando el metodo del controlador a testear
         AppointmentEntity result = appointmentMapper.toEntity(appointmentDto);
 
+        // Then
         assertNotNull(result);
         assertEquals(appointmentDto.startDate(), result.getStartDate());
         assertEquals(appointmentDto.endDate(), result.getEndDate());

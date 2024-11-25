@@ -43,6 +43,7 @@ class CallaboratorServiceTest {
     @Mock
     private RolePermissionRepository rolePermissionRepository;
 
+    //Variables globales para el Given global
     private UserEntity user;
     private RoleEntity role;
     private PermissionEntity permission;
@@ -53,6 +54,7 @@ class CallaboratorServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
+        //Given Global
         role = new RoleEntity("EMPLEADO", "Employee Role");
         role.setId(1L);
 
@@ -60,6 +62,7 @@ class CallaboratorServiceTest {
         user.setId(1L);
         user.setRole(role);
 
+        //Given Global
         permission = new PermissionEntity("VIEW", "View Permission");
 
         updateDTO = new UserUpdateDTO(1L, new RoleDTO(1L, "EMPLEADO", "Employee Role"), List.of(1L));
@@ -90,11 +93,14 @@ class CallaboratorServiceTest {
 
     @Test
     void givenNonExistentUser_whenUpdateUserPermissionRole_thenThrowException() {
-        // Given
+
+        // When
         when(userRepository.findById(updateDTO.idUser())).thenReturn(Optional.empty());
 
-        // When / Then
+        // Llamar al método a probar
         assertThrows(RuntimeException.class, () -> callaboratorService.updateUserPermissionRole(updateDTO));
+
+        //Then
         verify(userRepository, times(1)).findById(updateDTO.idUser());
         verify(roleRepository, never()).findById(anyLong());
         verify(permissionRepository, never()).findById(anyLong());
@@ -203,14 +209,13 @@ class CallaboratorServiceTest {
         when(permissionRepository.findById(100L)).thenReturn(Optional.of(permission));
         when(permissionRepository.findById(101L)).thenReturn(Optional.empty());
 
-        // When / Then
+        // When
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> callaboratorService.updateRolePermission(createRoleDto, 1L));
 
-        // Verificar el mensaje de la excepción
+        // VThen
         assertEquals("Permission not found", exception.getMessage());
 
-        // Verificar interacciones con los mocks
         verify(roleRepository, times(1)).findById(1L);
         verify(permissionRepository, times(2)).findById(anyLong());
         verify(rolePermissionRepository, times(1)).deleteAllByRoleId(1L);
@@ -227,13 +232,13 @@ class CallaboratorServiceTest {
 
         PermissionEntity permission2 = new PermissionEntity("EDIT", "Edit Permission");
         permission2.setId(101L);
-
         CreateRoleDto createRoleDto = new CreateRoleDto("ADMIN", "Administrator Role", List.of(100L, 101L));
 
+        // When
         when(permissionRepository.findById(100L)).thenReturn(Optional.of(permission1));
         when(permissionRepository.findById(101L)).thenReturn(Optional.of(permission2));
 
-        // When
+        //Llamando al metodo a testar
         CreateRoleDto result = callaboratorService.createRolePermissions(createRoleDto, role);
 
         // Then
@@ -256,13 +261,15 @@ class CallaboratorServiceTest {
 
         CreateRoleDto createRoleDto = new CreateRoleDto("ADMIN", "Administrator Role", List.of(100L, 101L));
 
+        // When
         when(permissionRepository.findById(100L)).thenReturn(Optional.of(permission1));
         when(permissionRepository.findById(101L)).thenReturn(Optional.empty());
 
-        // When / Then
+        // Llamando a al funcion a testear
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> callaboratorService.createRolePermissions(createRoleDto, role));
 
+        //Then
         assertEquals("Permission not found", exception.getMessage());
 
         verify(permissionRepository, times(1)).findById(100L);

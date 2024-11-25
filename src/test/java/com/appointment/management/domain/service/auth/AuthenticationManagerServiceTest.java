@@ -40,27 +40,32 @@ public class AuthenticationManagerServiceTest {
     @InjectMocks
     private AuthenticationManagerService authenticationManagerService;
 
+    //globales
+    private String email;
+    private String password;
+    private UserEntity user;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        //Given
+        email = "test@example.com";
+        password = "password";
+        user = new UserEntity("John Doe", "123456789",
+                "FADFA", "987654321", email, "555-5555", new RoleEntity("CLIENTE","afdfds"));
+        user.setUserPermissions(Collections.singleton(new UserPermissionEntity(user, new PermissionEntity("READ", "Read permission"))));
+
     }
 
     @Test
     void authenticate_ShouldReturnAuthentication_WhenCredentialsAreValid() {
-        // Given
-        String email = "test@example.com";
-        String password = "password";
-        UserEntity user = new UserEntity("John Doe", "123456789",
-                "FADFA", "987654321", email, "555-5555", new RoleEntity("CLIENTE","afdfds"));
-        user.setUserPermissions(Collections.singleton(new UserPermissionEntity(user, new PermissionEntity("READ", "Read permission"))));
-
+        // When
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
         when(encoder.matches(password, user.getPassword())).thenReturn(true);
         when(signUpConfirmationCodes.containsKey(email)).thenReturn(false);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(email, password);
-
-        // When
+        //llamada la funcion a testear
         Authentication result = authenticationManagerService.authenticate(auth);
 
         // Then
@@ -75,22 +80,22 @@ public class AuthenticationManagerServiceTest {
         String email = "test@example.com";
         String password = "password";
 
+        //When
         when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
         Authentication auth = new UsernamePasswordAuthenticationToken(email, password);
 
-        // When & Then
+        // Then
         assertThrows(BadCredentialsException.class, () -> authenticationManagerService.authenticate(auth));
     }
 
     @Test
     void authenticate_ShouldThrowBadCredentialsException_WhenPasswordIsInvalid() {
         // Given
-        String email = "test@example.com";
-        String password = "password";
         UserEntity user = new UserEntity("John Doe", "123456789",
                 "FADFA", "987654321", email, "555-5555", new RoleEntity("CLIENTE","afdfds"));
 
+        // When
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
         when(encoder.matches(password, user.getPassword())).thenReturn(false);
         when(signUpConfirmationCodes.containsKey(email)).thenReturn(false);
@@ -103,15 +108,12 @@ public class AuthenticationManagerServiceTest {
 
     @Test
     void authenticate_ShouldThrowInsufficientAuthenticationException_WhenAccountNotConfirmed() {
-        // Given
-        String email = "test@example.com";
-        String password = "password";
-
+        // When
         when(signUpConfirmationCodes.containsKey(email)).thenReturn(true);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(email, password);
 
-        // When & Then
+        // Then
         assertThrows(InsufficientAuthenticationException.class, () -> authenticationManagerService.authenticate(auth));
     }
 }

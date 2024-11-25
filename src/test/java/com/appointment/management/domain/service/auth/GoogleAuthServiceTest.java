@@ -23,6 +23,7 @@ class GoogleAuthServiceTest {
     @InjectMocks
     private GoogleAuthService googleAuthService;
 
+    //variables globales para el Given global
     private String googleAuthKey;
     private int validCode;
     private String companyName;
@@ -30,6 +31,7 @@ class GoogleAuthServiceTest {
 
     @BeforeEach
     void setUp() {
+        //Given Global
         googleAuthKey = "testAuthKey";
         validCode = 123456;
         companyName = "TestCompany";
@@ -66,9 +68,9 @@ class GoogleAuthServiceTest {
     void getUserGoogleAuthKey_ShouldReturnGeneratedKey() {
         // Given
         GoogleAuthenticatorKey credentials = new GoogleAuthenticatorKey.Builder(googleAuthKey).build();
-        when(googleAuth.createCredentials()).thenReturn(credentials);
 
         // When
+        when(googleAuth.createCredentials()).thenReturn(credentials);
         String result = googleAuthService.getUserGoogleAuthKey();
 
         // Then

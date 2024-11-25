@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -32,6 +31,7 @@ class BusinessConfigurationServiceTest {
     @InjectMocks
     private BusinessConfigurationService businessConfigurationService;
 
+    //variables globales para el Given global
     private BusinessConfigurationDto businessConfigurationDto;
     private BusinessConfigurationEntity businessConfigurationEntity;
 
@@ -39,6 +39,7 @@ class BusinessConfigurationServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
+        //Given: Global
         businessConfigurationDto = new BusinessConfigurationDto(
                 1L,
                 "Business Name",
@@ -54,7 +55,7 @@ class BusinessConfigurationServiceTest {
                 BigDecimal.valueOf(24.00),
                 false
         );
-
+        //Given: Global
         businessConfigurationEntity = new BusinessConfigurationEntity();
         businessConfigurationEntity.setId(1L);
         businessConfigurationEntity.setName("Business Name");
@@ -71,9 +72,10 @@ class BusinessConfigurationServiceTest {
     @DisplayName("Dato una configuracion del negorio"+"Cuando lo guardamos"+ "se espera que el usario se guarde correctamenta")
     @Test
     void testSaveBusinessConfiguration() {
+
+        //When
         when(businessConfigurationMapper.toEntity(any(BusinessConfigurationDto.class)))
                 .thenReturn(businessConfigurationEntity);
-
 
         when(businessConfigurationRepository.save(any(BusinessConfigurationEntity.class)))
                 .thenReturn(businessConfigurationEntity);
@@ -83,6 +85,7 @@ class BusinessConfigurationServiceTest {
 
         BusinessConfigurationDto savedConfig = businessConfigurationService.save(businessConfigurationDto);
 
+        //Then
         assertNotNull(savedConfig);
         assertEquals(this.businessConfigurationDto.name(), savedConfig.name());
         assertEquals(this.businessConfigurationDto.logoUrl(), savedConfig.logoUrl());
@@ -99,13 +102,17 @@ class BusinessConfigurationServiceTest {
     @DisplayName("Dato un id"+"Cuando lo buscamos"+ "se espera la configuracion correcta")
     @Test
     void shouldReturnBusinessConfigurationWhenIdExists() {
+        //Given
         Long id = 1L;
 
+        //When
         when(businessConfigurationRepository.findById(id)).thenReturn(Optional.of(this.businessConfigurationEntity));
         when(businessConfigurationMapper.toDto(this.businessConfigurationEntity)).thenReturn(this.businessConfigurationDto);
 
+        //llamado de la funcion a testear
         BusinessConfigurationDto result = businessConfigurationService.findById(id);
 
+        //Then
         assertNotNull(result);
         assertEquals(this.businessConfigurationDto.name(), result.name());
     }
@@ -113,9 +120,10 @@ class BusinessConfigurationServiceTest {
     @DisplayName("Dato un id inexistente"+"Cuando lo buscamos"+ "se espera una excepcion de ValueNotFoundException")
     @Test
     void shouldThrowExceptionWhenBusinessConfigurationNotFound() {
-
+        //Given
         Long id = 999L;
 
+        //When
         when(businessConfigurationRepository.findById(id)).thenReturn(Optional.empty());
 
         ValueNotFoundException thrown = assertThrows(
@@ -124,26 +132,29 @@ class BusinessConfigurationServiceTest {
                 "Expected findById() to throw, but it didn't"
         );
 
+        //Then
         assertTrue(thrown.getMessage().contains("Business configuration not found with ID: " + id));
     }
 
     @DisplayName("Dato un id y cambio de configuraciones"+"Cuando modificamos"+ "se espera que se actulize la configuracioens correctamente")
     @Test
     void shouldUpdateBusinessConfiguration() {
-        // Dado
+        // Given
         Long id = 1L;
-
         BusinessConfigurationEntity updatedEntity = new BusinessConfigurationEntity();
         updatedEntity.setId(id);
         updatedEntity.setName("Updated Business");
 
+        //When
         when(businessConfigurationRepository.findById(id)).thenReturn(Optional.of(this.businessConfigurationEntity));
         when(businessConfigurationMapper.toEntity(this.businessConfigurationDto)).thenReturn(updatedEntity);
         when(businessConfigurationRepository.save(updatedEntity)).thenReturn(updatedEntity);
         when(businessConfigurationMapper.toDto(updatedEntity)).thenReturn(this.businessConfigurationDto);
 
+        //Llamado de funcion a testear
         BusinessConfigurationDto result = businessConfigurationService.update(id, this.businessConfigurationDto);
 
+        //Then
         assertNotNull(result);
         assertEquals(this.businessConfigurationDto.name(), result.name());
     }
@@ -151,9 +162,10 @@ class BusinessConfigurationServiceTest {
     @DisplayName("Dato un id invalido y cambio de configuraciones"+"Cuando modificamos"+ "da una excepcion ValueNotFoundException")
     @Test
     void shouldThrowExceptionWhenUpdateBusinessConfigurationNotFount() {
-        // Dado
+        // Given
         Long id = 1999L;
 
+        //When
         when(businessConfigurationRepository.findById(id)).thenReturn(Optional.empty());
 
         ValueNotFoundException thrown = assertThrows(
@@ -161,6 +173,8 @@ class BusinessConfigurationServiceTest {
                 () -> businessConfigurationService.update(id, this.businessConfigurationDto),
                 "Expected findById() to throw, but it didn't"
         );
+
+        //Then
         assertTrue(thrown.getMessage().contains("Configuracion del negocio no encontradas con el Id: " + id));
     }
 
@@ -168,7 +182,7 @@ class BusinessConfigurationServiceTest {
             " se espera que se devuelva la configuración correcta")
     @Test
     void shouldReturnFirstBusinessConfigurationWhenExists() {
-        // Dado
+        // Given
         BusinessConfigurationEntity firstEntity = new BusinessConfigurationEntity();
         firstEntity.setId(1L);
         firstEntity.setName("First Business");
@@ -178,14 +192,15 @@ class BusinessConfigurationServiceTest {
                 firstEntity.getLogoUrl()
         );
 
+        // When
         when(businessConfigurationRepository.findFirstByOrderByIdAsc())
                 .thenReturn(Optional.of(firstEntity));
         when(businessConfigurationMapper.toDto(firstEntity)).thenReturn(firstDto);
 
-        // Cuando
+        //Llamado de funcion a testear
         BusinessConfigurationDto result = businessConfigurationService.findFirst();
 
-        // Entonces
+        // Then
         assertNotNull(result);
         assertEquals(firstDto.name(), result.name());
         assertEquals(firstDto.logoUrl(), result.logoUrl());
@@ -196,17 +211,18 @@ class BusinessConfigurationServiceTest {
             " se espera una excepción de ValueNotFoundException")
     @Test
     void shouldThrowExceptionWhenNoBusinessConfigurationFound() {
-        // Dado
+        // When
         when(businessConfigurationRepository.findFirstByOrderByIdAsc())
                 .thenReturn(Optional.empty());
 
-        // Cuando / Entonces
+        // When
         ValueNotFoundException thrown = assertThrows(
                 ValueNotFoundException.class,
                 () -> businessConfigurationService.findFirst(),
                 "Expected findFirst() to throw, but it didn't"
         );
 
+        //Then
         assertTrue(thrown.getMessage().contains("No business configuration found"));
     }
 

@@ -60,25 +60,29 @@ class AuthControllerTest {
     @InjectMocks
     private AuthController authController;
 
+    //Variables Globales para el Given global
+    private SignUpDto signUpDto;
+    private UserDto expectedUserDto;
+    private String confirmationCode;
+    private String confirmationHtml;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        //Given Global
+        signUpDto = new SignUpDto("testUser", "test@example.com", "password123","fadfad00","2515","afadf");
+        expectedUserDto = new UserDto(1L, "testUser", "test@example.com", "USER", "fsd", "555", LocalDateTime.now(), "fadsf", false, "adfd", new ArrayList<>());
+        confirmationCode = "123456";
+        confirmationHtml = "<html><body>Confirmation Email</body></html>";
     }
 
     @Test
     void testSignUp() {
         // Given
-        SignUpDto signUpDto = new SignUpDto("testUser", "test@example.com", "password123","fadfad00","2515","afadf");
-        UserDto expectedUserDto = new UserDto(1L, "testUser", "test@example.com", "USER", "fsd", "555", LocalDateTime.now(), "fadsf", false, "adfd", new ArrayList<>());
-        String confirmationCode = "123456";
-        String confirmationHtml = "<html><body>Confirmation Email</body></html>";
-
         given(userService.registerUser(any(SignUpDto.class))).willReturn(expectedUserDto);
         given(authConfirmationService.generateEmailConfirmationCode(expectedUserDto.email())).willReturn(confirmationCode);
         given(templateRendererService.renderTemplate(any(String.class), any(Map.class))).willReturn(confirmationHtml);
-
-        // Simulamos el envío del correo electrónico
-
 
         // When
         ResponseEntity<UserDto> response = authController.signUp(signUpDto);
@@ -86,23 +90,8 @@ class AuthControllerTest {
         // Then
         verify(userService, times(1)).registerUser(signUpDto);
         verify(authConfirmationService, times(1)).generateEmailConfirmationCode(expectedUserDto.email());
-
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(expectedUserDto, response.getBody());
-    }
-
-    @Test
-    void testSignUpEmailSendFailure()  {
-        // Given
-        SignUpDto signUpDto = new SignUpDto("testUser", "test@example.com", "password123","fadfad00","2515","afadf");
-        UserDto expectedUserDto = new UserDto(1L, "testUser", "test@example.com", "USER", "fsd", "555", LocalDateTime.now(), "fadsf", false, "adfd", new ArrayList<>());
-        String confirmationCode = "123456";
-        String confirmationHtml = "<html><body>Confirmation Email</body></html>";
-
-        given(userService.registerUser(any(SignUpDto.class))).willReturn(expectedUserDto);
-        given(authConfirmationService.generateEmailConfirmationCode(expectedUserDto.email())).willReturn(confirmationCode);
-        given(templateRendererService.renderTemplate(any(String.class), any(Map.class))).willReturn(confirmationHtml);
-
     }
 
     @Test
@@ -111,14 +100,12 @@ class AuthControllerTest {
         SignUpConfirmationDto confirmationDto = new SignUpConfirmationDto("test@example.com", "123456");
         TokenDto expectedToken = new TokenDto("token123", 1L, "testUser", "test@example.com", false, "USER");
 
-        // Simular el comportamiento de confirmación de correo electrónico
+        //When
         given(authConfirmationService.confirmUserEmailCode(confirmationDto.email(), confirmationDto.code())).willReturn(true);
-        // Simular la búsqueda del usuario con clave de Google
         given(userService.findUserWithGoogleKeyByEmail(confirmationDto.email())).willReturn(Optional.of(new UserWithGoogleSecretDto(1L, "testUser", "test@example.com", "USER", "googleKey")));
-        // Simular la creación del token
         given(tokenService.generateAccessToken(any(Long.class))).willReturn("token123");
 
-        // When
+        //Ejecutando el metodo del controlador a testear
         ResponseEntity<TokenDto> response = authController.confirmSignUp(confirmationDto);
 
         // Then
@@ -134,10 +121,10 @@ class AuthControllerTest {
         // Given
         SignUpConfirmationDto confirmationDto = new SignUpConfirmationDto("test@example.com", "wrongCode");
 
-        // Simular que la confirmación de correo electrónico falla
+        //When
         given(authConfirmationService.confirmUserEmailCode(confirmationDto.email(), confirmationDto.code())).willReturn(false);
 
-        // When / Then
+        // Then
         assertThrows(FailedAuthenticateException.class, () -> authController.confirmSignUp(confirmationDto));
     }
 
@@ -146,12 +133,11 @@ class AuthControllerTest {
         // Given
         SignUpConfirmationDto confirmationDto = new SignUpConfirmationDto("test@example.com", "123456");
 
-        // Simular la confirmación de correo electrónico
+        //When
         given(authConfirmationService.confirmUserEmailCode(confirmationDto.email(), confirmationDto.code())).willReturn(true);
-        // Simular que no se encuentra el usuario
         given(userService.findUserWithGoogleKeyByEmail(confirmationDto.email())).willReturn(Optional.empty());
 
-        // When / Then
+        // Then
         assertThrows(InsufficientAuthenticationException.class, () -> authController.confirmSignUp(confirmationDto));
     }
 
@@ -162,14 +148,12 @@ class AuthControllerTest {
         UserWithGoogleSecretDto expectedUser = new UserWithGoogleSecretDto(1L, "testUser", "test@example.com", "USER", null);
         TokenDto expectedToken = new TokenDto("token123", expectedUser.id(), expectedUser.name(), expectedUser.email(), false, expectedUser.role());
 
-        // Simular autenticación
+        //When
         given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).willReturn(mock(Authentication.class));
-        // Simular búsqueda del usuario
         given(userService.findUserWithGoogleKeyByEmail(signInDto.email())).willReturn(Optional.of(expectedUser));
-        // Simular generación del token
         given(tokenService.generateAccessToken(expectedUser.id())).willReturn("token123");
 
-        // When
+        //Ejecutando el metodo del controlador a testear
         ResponseEntity<?> response = authController.signIn(signInDto);
 
         // Then
@@ -186,12 +170,11 @@ class AuthControllerTest {
         SignInDto signInDto = new SignInDto("test@example.com", "password123");
         UserWithGoogleSecretDto expectedUser = new UserWithGoogleSecretDto(1L, "testUser", "test@example.com", "USER", "googleKey");
 
-        // Simular autenticación
+        //When
         given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).willReturn(mock(Authentication.class));
-        // Simular búsqueda del usuario
         given(userService.findUserWithGoogleKeyByEmail(signInDto.email())).willReturn(Optional.of(expectedUser));
 
-        // When
+        //Ejecutando el metodo del controlador a testear
         ResponseEntity<?> response = authController.signIn(signInDto);
 
         // Then
@@ -206,10 +189,10 @@ class AuthControllerTest {
         // Given
         SignInDto signInDto = new SignInDto("test@example.com", "wrongPassword");
 
-        // Simular que la autenticación lanza una excepción
+        // When
         doThrow(new RuntimeException("Authentication failed")).when(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
 
-        // When / Then
+        // Then
         assertThrows(RuntimeException.class, () -> authController.signIn(signInDto));
     }
 
@@ -218,12 +201,11 @@ class AuthControllerTest {
         // Given
         SignInDto signInDto = new SignInDto("test@example.com", "password123");
 
-        // Simular autenticación
+        //When
         given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).willReturn(mock(Authentication.class));
-        // Simular que no se encuentra el usuario
         given(userService.findUserWithGoogleKeyByEmail(signInDto.email())).willReturn(Optional.empty());
 
-        // When
+        //Ejecutando el metodo del controlador a testear
         ResponseEntity<?> response = authController.signIn(signInDto);
 
         // Then
@@ -240,14 +222,12 @@ class AuthControllerTest {
         UserWithGoogleSecretDto user2fa = new UserWithGoogleSecretDto(1L, "testUser", "test@example.com", "USER", "googleAuthKey");
         TokenDto expectedToken = new TokenDto("token123", user2fa.id(), user2fa.name(), user2fa.email(), false, user2fa.role());
 
-        // Simular búsqueda del usuario
+        // When
         given(userService.findUserWithGoogleKeyByEmail(signIn2faDto.email())).willReturn(Optional.of(user2fa));
-        // Simular validación del código de Google Auth
         given(googleAuthService.authencateUserWithGoogleAuth(user2fa.googleAuthKey(), signIn2faDto.code())).willReturn(true);
-        // Simular generación del token
         given(tokenService.generateAccessToken(user2fa.id())).willReturn("token123");
 
-        // When
+        //Ejecutando el metodo del controlador a testear
         ResponseEntity<TokenDto> response = authController.signIn2fa(signIn2faDto);
 
         // Then
@@ -263,12 +243,11 @@ class AuthControllerTest {
         // Given
         SignIn2faDto signIn2faDto = new SignIn2faDto("test@example.com", 1234);
 
-        // Simular búsqueda del usuario
+        // When
         given(userService.findUserWithGoogleKeyByEmail(signIn2faDto.email())).willReturn(Optional.empty());
 
-        // When / Then
+        // Then
         assertThrows(ValueNotFoundException.class, () -> authController.signIn2fa(signIn2faDto));
-
         verify(userService, times(1)).findUserWithGoogleKeyByEmail(signIn2faDto.email());
     }
 
@@ -278,10 +257,10 @@ class AuthControllerTest {
         SignIn2faDto signIn2faDto = new SignIn2faDto("test@example.com", 1234);
         UserWithGoogleSecretDto user2fa = new UserWithGoogleSecretDto(1L, "testUser", "test@example.com", "USER", null);
 
-        // Simular búsqueda del usuario
+        // When
         given(userService.findUserWithGoogleKeyByEmail(signIn2faDto.email())).willReturn(Optional.of(user2fa));
 
-        // When / Then
+        // Then
         assertThrows(BadRequestException.class, () -> authController.signIn2fa(signIn2faDto));
 
         verify(userService, times(1)).findUserWithGoogleKeyByEmail(signIn2faDto.email());
@@ -293,14 +272,12 @@ class AuthControllerTest {
         SignIn2faDto signIn2faDto = new SignIn2faDto("test@example.com", 1234);
         UserWithGoogleSecretDto user2fa = new UserWithGoogleSecretDto(1L, "testUser", "test@example.com", "USER", "googleAuthKey");
 
-        // Simular búsqueda del usuario
+        //When
         given(userService.findUserWithGoogleKeyByEmail(signIn2faDto.email())).willReturn(Optional.of(user2fa));
-        // Simular fallo en la autenticación de Google Auth
         given(googleAuthService.authencateUserWithGoogleAuth(user2fa.googleAuthKey(), signIn2faDto.code())).willReturn(false);
 
-        // When / Then
+        //  Then
         assertThrows(InsufficientAuthenticationException.class, () -> authController.signIn2fa(signIn2faDto));
-
         verify(userService, times(1)).findUserWithGoogleKeyByEmail(signIn2faDto.email());
         verify(googleAuthService, times(1)).authencateUserWithGoogleAuth(user2fa.googleAuthKey(), signIn2faDto.code());
     }
@@ -310,19 +287,15 @@ class AuthControllerTest {
         // Given
         RecoverPasswordDto recoverPasswordDto = new RecoverPasswordDto("test@example.com");
         UserDto dbUser = new UserDto(1L, "testUser", "test@example.com", "USER", "fsd", "555", LocalDateTime.now(), "fadsf", false, "adfd", new ArrayList<>());
-        String confirmationCode = "123456";
-        String confirmationHtml = "<html><body>Confirmation Code: 123456</body></html>";
+        confirmationCode = "123456";
+        confirmationHtml = "<html><body>Confirmation Code: 123456</body></html>";
 
-        // Simular búsqueda del usuario
+        // When
         given(userService.findUserByEmail(recoverPasswordDto.email())).willReturn(Optional.of(dbUser));
-        // Simular generación del código de confirmación
         given(authConfirmationService.generateEmailConfirmationCode(dbUser.email())).willReturn(confirmationCode);
-        // Simular renderizado de la plantilla
         given(templateRendererService.renderTemplate("recover-password", Map.of("code", confirmationCode.toCharArray(), "user", dbUser)))
                 .willReturn(confirmationHtml);
 
-
-        // When
         ResponseEntity<?> response = authController.recoverPassword(recoverPasswordDto);
 
         // Then
@@ -336,10 +309,10 @@ class AuthControllerTest {
         // Given
         RecoverPasswordDto recoverPasswordDto = new RecoverPasswordDto("test@example.com");
 
-        // Simular búsqueda del usuario
+        // When
         given(userService.findUserByEmail(recoverPasswordDto.email())).willReturn(Optional.empty());
 
-        // When / Then
+        // Then
         assertThrows(ValueNotFoundException.class, () -> authController.recoverPassword(recoverPasswordDto));
 
         verify(userService, times(1)).findUserByEmail(recoverPasswordDto.email());
@@ -353,17 +326,13 @@ class AuthControllerTest {
         String confirmationCode = "123456";
         String confirmationHtml = "<html><body>Confirmation Code: 123456</body></html>";
 
-        // Simular búsqueda del usuario
+        //When
         given(userService.findUserByEmail(recoverPasswordDto.email())).willReturn(Optional.of(dbUser));
-        // Simular generación del código de confirmación
         given(authConfirmationService.generateEmailConfirmationCode(dbUser.email())).willReturn(confirmationCode);
-        // Simular renderizado de la plantilla
+
+        //Then
         given(templateRendererService.renderTemplate("recover-password", Map.of("code", confirmationCode.toCharArray(), "user", dbUser)))
                 .willReturn(confirmationHtml);
-
-
-        // When / Then
-
     }
 
 
@@ -373,12 +342,11 @@ class AuthControllerTest {
         RecoverPasswordConfirmationDto recoverPasswordConfirmationDto = new RecoverPasswordConfirmationDto("test@example.com", "123456");
         boolean isConfirmed = false;
 
-        // Simular que la confirmación falla
+        /// When
         given(authConfirmationService.confirmUserEmailCode(recoverPasswordConfirmationDto.email(), recoverPasswordConfirmationDto.code())).willReturn(isConfirmed);
 
-        // When / Then
+         // Then
         assertThrows(RequestConflictException.class, () -> authController.confirmSignUp(recoverPasswordConfirmationDto));
-
         verify(authConfirmationService, times(1)).confirmUserEmailCode(recoverPasswordConfirmationDto.email(), recoverPasswordConfirmationDto.code());
         verify(userService, times(0)).findUserWithGoogleKeyByEmail(any());
     }
@@ -389,12 +357,18 @@ class AuthControllerTest {
         RecoverPasswordConfirmationDto recoverPasswordConfirmationDto = new RecoverPasswordConfirmationDto("test@example.com", "123456");
         boolean isConfirmed = true;
 
-        // Simular confirmación exitosa del código de correo
+        //Then
         given(authConfirmationService.confirmUserEmailCode(recoverPasswordConfirmationDto.email(), recoverPasswordConfirmationDto.code())).willReturn(isConfirmed);
-        // Simular que no se encuentra el usuario
         given(userService.findUserWithGoogleKeyByEmail(recoverPasswordConfirmationDto.email())).willReturn(Optional.empty());
+    }
 
-        // When / Then
+    @Test
+    void testSignUpEmailSendFailure()  {
+
+        //When /Then
+        given(userService.registerUser(any(SignUpDto.class))).willReturn(expectedUserDto);
+        given(authConfirmationService.generateEmailConfirmationCode(expectedUserDto.email())).willReturn(confirmationCode);
+        given(templateRendererService.renderTemplate(any(String.class), any(Map.class))).willReturn(confirmationHtml);
 
     }
 

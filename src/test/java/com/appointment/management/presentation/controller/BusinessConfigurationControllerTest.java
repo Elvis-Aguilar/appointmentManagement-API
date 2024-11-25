@@ -32,15 +32,17 @@ class BusinessConfigurationControllerTest {
     @InjectMocks
     private BusinessConfigurationController businessConfigurationController;
 
+    //Varivales globales para el given global
     private BusinessConfigurationDto validDto;
     private Validator validator;
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
+
+        //Given global
         validDto = new BusinessConfigurationDto(1L, "Test Business", "logo-url", 1L, null, "Test Description",
                 "SERVICES", 7, 2, BigDecimal.valueOf(100), 7, BigDecimal.valueOf(2), false);
-        // Inicializar el validador correctamente
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
 
@@ -48,15 +50,15 @@ class BusinessConfigurationControllerTest {
 
     @Test
     void shouldCreateBusinessConfiguration() {
-        // Arrange
+        // When
         when(businessConfigurationService.save(any(BusinessConfigurationDto.class)))
                 .thenReturn(validDto);
 
-        // Act
+        //Ejecutando el metodo del controlador a testear
         ResponseEntity<BusinessConfigurationDto> response = businessConfigurationController
                 .createBusinessConfiguration(validDto);
 
-        // Assert
+        // Then
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("Test Business", response.getBody().name());
@@ -67,14 +69,14 @@ class BusinessConfigurationControllerTest {
 
     @Test
     void shouldGetBusinessConfigurationById() {
-        // Arrange
+        // When
         when(businessConfigurationService.findById(1L)).thenReturn(validDto);
 
-        // Act
+        //Ejecutando el metodo del controlador a testear
         ResponseEntity<BusinessConfigurationDto> response = businessConfigurationController
                 .getBusinessConfigurationById(1L);
 
-        // Assert
+        // Then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1L, response.getBody().id());
@@ -85,30 +87,31 @@ class BusinessConfigurationControllerTest {
 
     @Test
     void shouldThrowExceptionWhenBusinessConfigurationNotFound() {
-        // Arrange
+        // When
         when(businessConfigurationService.findById(1L))
                 .thenThrow(new ValueNotFoundException("Business configuration not found"));
 
-        // Act & Assert
+        //Ejecutando el metodo del controlador a testear
         ValueNotFoundException thrown = assertThrows(ValueNotFoundException.class, () -> {
             businessConfigurationController.getBusinessConfigurationById(1L);
         });
 
+        //Then
         assertEquals("Business configuration not found", thrown.getMessage());
         verify(businessConfigurationService).findById(1L);
     }
 
     @Test
     void shouldUpdateBusinessConfiguration() {
-        // Arrange
+        // Given
         when(businessConfigurationService.update(eq(1L), any(BusinessConfigurationDto.class)))
                 .thenReturn(validDto);
 
-        // Act
+        // When
         ResponseEntity<BusinessConfigurationDto> response = businessConfigurationController
                 .updateBusinessConfiguration(1L, validDto);
 
-        // Assert
+        // Then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1L, response.getBody().id());
@@ -119,7 +122,7 @@ class BusinessConfigurationControllerTest {
 
     @Test
     void shouldThrowValidationExceptionForInvalidDto() {
-        // Crear DTO inválido
+        // Given
         BusinessConfigurationDto invalidDto = new BusinessConfigurationDto(
                 -1L, "afdfdfa", "invalid-url", 1L, null, "dfadfadfasdf", "SERVICES",
                 1, 2, BigDecimal.valueOf(100), 7, BigDecimal.valueOf(2), false
@@ -129,24 +132,26 @@ class BusinessConfigurationControllerTest {
 
         assertFalse(violations.isEmpty());
 
+        //When
         String actualMessage = violations.stream()
                 .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                 .collect(Collectors.joining("; "));
 
         String expectedMessage = "id: debe ser mayor que 0";
 
+        //Then
         assertEquals(expectedMessage, actualMessage);
     }
 
     @Test
     void getBusinessConfigurationByFirst_ShouldReturnBusinessConfiguration_WhenFound() {
-        // Arrange: Configura el comportamiento del mock
+        // Given
         when(businessConfigurationService.findFirst()).thenReturn(validDto);
 
-        // Act: Llama al método que estás probando
+        // When
         ResponseEntity<BusinessConfigurationDto> response = businessConfigurationController.getBusinessConfigurationByFirst();
 
-        // Assert: Verifica el resultado
+        // Then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(validDto, response.getBody());
     }

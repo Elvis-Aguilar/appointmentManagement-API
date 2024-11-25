@@ -3,59 +3,40 @@ package com.appointment.management.presentation.controller;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.appointment.management.domain.dto.appoinment.AppointmentDto;
-import com.appointment.management.domain.dto.business.BusinessConfigurationDto;
-import com.appointment.management.domain.dto.report.AppointmentReportDto;
-import com.appointment.management.domain.dto.report.AppointmentReportItemDto;
-import com.appointment.management.domain.dto.report.clienteReportItemDto;
 import com.appointment.management.domain.service.appointmet.AppointmetnService;
-import com.appointment.management.domain.service.business.BusinessConfigurationService;
-import com.appointment.management.domain.service.report.DownloadPdfService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 class AppointmentControllerTest {
 
-
-
     @Mock
     private AppointmetnService appointmentService;
-
-    @Mock
-    private BusinessConfigurationService businessConfigurationService;
-
-    @Mock
-    private DownloadPdfService downloadPdfService;
-
 
     @InjectMocks
     private AppointmentController appointmentController;
 
+    //Variable global para el Given Global
     private AppointmentDto appointmentDto;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        //Given Global
         appointmentDto = new AppointmentDto(
                 1L,
                 1L,

@@ -30,12 +30,15 @@ class BusinessHoursControllerTest {
     @Mock
     private BusinessHoursService businessHoursService;
 
+    //Variable global para Given Global
     private BusinessHoursDto businessHoursDto;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-                businessHoursDto = new BusinessHoursDto(
+
+        //Given Global
+        businessHoursDto = new BusinessHoursDto(
                 1L,
                 10L,
                 "Monday",
@@ -62,7 +65,6 @@ class BusinessHoursControllerTest {
         assertEquals(businessHoursDto, response.getBody());
         verify(businessHoursService, times(1)).save(businessHoursDto);
     }
-
 
     @Test
     public void createBusinessHoursGeneral_ShouldReturnCreatedBusinessHours() {

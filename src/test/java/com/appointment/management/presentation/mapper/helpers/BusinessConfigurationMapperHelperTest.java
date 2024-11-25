@@ -28,6 +28,7 @@ class BusinessConfigurationMapperHelperTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
+        //Given Global
         businessConfigurationEntity = new BusinessConfigurationEntity();
         businessConfigurationEntity.setId(1L);
         businessConfigurationEntity.setName("Default Configuration");
@@ -35,10 +36,13 @@ class BusinessConfigurationMapperHelperTest {
 
     @Test
     void shouldReturnBusinessConfigurationWhenIdIsValidAndExists() {
+        // When
         when(businessConfigurationRepository.findById(1L)).thenReturn(Optional.of(businessConfigurationEntity));
 
+        // Ejecucion del metodo a testear
         BusinessConfigurationEntity result = businessConfigurationMapperHelper.findById(1L);
 
+        // Then
         assertNotNull(result);
         assertEquals(1L, result.getId());
         assertEquals("Default Configuration", result.getName());
@@ -48,21 +52,25 @@ class BusinessConfigurationMapperHelperTest {
 
     @Test
     void shouldReturnNullWhenBusinessConfigurationDoesNotExist() {
+        // When
         when(businessConfigurationRepository.findById(1L)).thenReturn(Optional.empty());
 
+        // Ejecucion del metodo a testear
         BusinessConfigurationEntity result = businessConfigurationMapperHelper.findById(1L);
 
+        // Then
         assertNull(result);
-
         verify(businessConfigurationRepository, times(1)).findById(1L);
     }
 
     @Test
     void shouldReturnNullWhenIdIsNull() {
+
+        // When
         BusinessConfigurationEntity result = businessConfigurationMapperHelper.findById(null);
 
+        // Then
         assertNull(result);
-
         verify(businessConfigurationRepository, never()).findById(any());
     }
 

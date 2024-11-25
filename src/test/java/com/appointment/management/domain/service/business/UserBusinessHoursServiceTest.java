@@ -37,33 +37,43 @@ class UserBusinessHoursServiceTest {
     @Captor
     private ArgumentCaptor<UserBusinessHoursEntity> userBusinessHoursCaptor;
 
+    //variables globales para Given Global
+    private Long businessHoursId;
+    private List<Long> userIds;
+    private UpdateUserBusinessHours updateUserBusinessHours;
+    private UserEntity user1;
+    private UserEntity user2;
+    private BusinessHoursEntity businessHours;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        //Given Global
+        businessHoursId = 1L;
+        userIds = List.of(101L, 102L);
+        updateUserBusinessHours = new UpdateUserBusinessHours(userIds);
+
+        businessHours = new BusinessHoursEntity();
+        businessHours.setId(businessHoursId);
+
+        user1 = new UserEntity("John Doe", "123456", "password", "1234567890123", "john@example.com", "555-1234", new RoleEntity( "Admin","fadfadf"));
+        user1.setId(101L);
+
+        user2 = new UserEntity("Jane Doe", "654321", "password", "9876543210123", "jane@example.com", "555-5678", new RoleEntity( "Admin","fadfadf"));
+        user2.setId(102L);
     }
 
     // Test: updateUserBusinessHours - Caso exitoso
     @Test
     void givenValidUpdateAndBusinessHours_whenUpdateUserBusinessHours_thenSaveEntities() {
-        // Given
-        Long businessHoursId = 1L;
-        List<Long> userIds = List.of(101L, 102L);
-        UpdateUserBusinessHours updateUserBusinessHours = new UpdateUserBusinessHours(userIds);
 
-        BusinessHoursEntity businessHours = new BusinessHoursEntity();
-        businessHours.setId(businessHoursId);
-
-        UserEntity user1 = new UserEntity("John Doe", "123456", "password", "1234567890123", "john@example.com", "555-1234", new RoleEntity( "Admin","fadfadf"));
-        user1.setId(101L);
-
-        UserEntity user2 = new UserEntity("Jane Doe", "654321", "password", "9876543210123", "jane@example.com", "555-5678", new RoleEntity( "Admin","fadfadf"));
-        user2.setId(102L);
-
+        // When
         when(businessHoursRepository.findById(businessHoursId)).thenReturn(Optional.of(businessHours));
         when(userRepository.findById(101L)).thenReturn(Optional.of(user1));
         when(userRepository.findById(102L)).thenReturn(Optional.of(user2));
 
-        // When
+        //Llmando a la funcion a testear
         userBusinessHoursService.updateUserBusinessHours(updateUserBusinessHours, businessHoursId);
 
         // Then
@@ -82,13 +92,15 @@ class UserBusinessHoursServiceTest {
     @Test
     void givenInvalidBusinessHoursId_whenUpdateUserBusinessHours_thenThrowException() {
         // Given
-        Long businessHoursId = 1L;
+        businessHoursId = 1L;
         when(businessHoursRepository.findById(businessHoursId)).thenReturn(Optional.empty());
 
-        // When / Then
+        // When
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 userBusinessHoursService.updateUserBusinessHours(new UpdateUserBusinessHours(new ArrayList<>()), businessHoursId)
         );
+
+        //Then
         assertEquals("role not found", exception.getMessage());
         verify(userBusinessHoursRepository, never()).deleteAllByBusinessHoursId(anyLong());
         verify(userBusinessHoursRepository, never()).save(any());
@@ -98,17 +110,18 @@ class UserBusinessHoursServiceTest {
     @Test
     void givenInvalidUserId_whenUpdateUserBusinessHours_thenThrowException() {
         // Given
-        Long businessHoursId = 1L;
+        businessHoursId = 1L;
         Long invalidUserId = 101L;
         UpdateUserBusinessHours updateUserBusinessHours = new UpdateUserBusinessHours(List.of(invalidUserId));
 
         BusinessHoursEntity businessHours = new BusinessHoursEntity();
         businessHours.setId(businessHoursId);
 
+        // When
         when(businessHoursRepository.findById(businessHoursId)).thenReturn(Optional.of(businessHours));
         when(userRepository.findById(invalidUserId)).thenReturn(Optional.empty());
 
-        // When / Then
+       // Then
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 userBusinessHoursService.updateUserBusinessHours(updateUserBusinessHours, businessHoursId)
         );
@@ -120,20 +133,13 @@ class UserBusinessHoursServiceTest {
     @Test
     void givenValidBusinessHoursId_whenGetUserBusinessHours_thenReturnDtoList() {
         // Given
-        Long businessHoursId = 1L;
-        UserEntity user1 = new UserEntity("John Doe", "123456", "password", "1234567890123", "john@example.com", "555-1234", new RoleEntity( "Admin","fadfadf"));
-        user1.setId(101L);
-
-        UserEntity user2 = new UserEntity("Jane Doe", "654321", "password", "9876543210123", "jane@example.com", "555-5678", new RoleEntity( "Admin","fadfadf"));
-        user2.setId(102L);
-
         UserBusinessHoursEntity userBusinessHours1 = new UserBusinessHoursEntity(user1, new BusinessHoursEntity());
         UserBusinessHoursEntity userBusinessHours2 = new UserBusinessHoursEntity(user2, new BusinessHoursEntity());
 
+        // When
         when(userBusinessHoursRepository.findAllByBusinessHoursId(businessHoursId))
                 .thenReturn(List.of(userBusinessHours1, userBusinessHours2));
 
-        // When
         List<UserHoursDto> userHoursDtos = userBusinessHoursService.getUserBusinessHours(businessHoursId);
 
         // Then

@@ -33,6 +33,7 @@ class AuthConfirmationServiceTest {
 
     @BeforeEach
     void setUp() {
+        //Given
         email = "test@example.com";
         code = "123456";
         GoogleAuthenticatorKey credentials = new GoogleAuthenticatorKey.Builder("testKey").build();
@@ -41,43 +42,48 @@ class AuthConfirmationServiceTest {
         lenient().when(googleAuth.getTotpPassword(credentials.getKey())).thenReturn(Integer.parseInt(code));
     }
 
-
     @Test
     void generateEmailConfirmationCode_ShouldGenerateAndStoreCode() {
-        // Act: Genera el código de confirmación de email
+        // When
         String generatedCode = authConfirmationService.generateEmailConfirmationCode(email);
 
-        // Assert: Verificar que el código es generado correctamente y se almacena
+        // Then
         assertEquals(code, generatedCode);
         verify(emailConfirmationCodes).put(email, generatedCode);
     }
 
     @Test
     void confirmUserEmailCode_ShouldReturnTrue_WhenCodeMatches() {
-        // Act: Llama al método de confirmación con el email y código correcto
+        //When
+        // Llama al método de confirmación con el email y código correcto
         boolean result = authConfirmationService.confirmUserEmailCode(email, code);
 
-        // Assert: Verificar que el código fue confirmado y removido
+        //Then
+        //Verificar que el código fue confirmado y removido
         assertFalse(result);
         verify(emailConfirmationCodes).remove(email, code);
     }
 
     @Test
     void confirmUserEmailCode_ShouldReturnFalse_WhenCodeDoesNotMatch() {
-        // Act: Llama al método de confirmación con un código incorrecto
+        //When
+        // Llama al método de confirmación con un código incorrecto
         boolean result = authConfirmationService.confirmUserEmailCode(email, "wrongCode");
 
-        // Assert: Verificar que el resultado es false y no se removió ningún código
+        //Then
+        // Verificar que el resultado es false y no se removió ningún código
         assertFalse(result);
         verify(emailConfirmationCodes).remove(email, "wrongCode");
     }
 
     @Test
     void confirmUserEmailCode_ShouldReturnFalse_WhenEmailNotFound() {
-        // Act: Llama al método de confirmación con un email que no tiene código asignado
+        //When
+        //Llama al método de confirmación con un email que no tiene código asignado
         boolean result = authConfirmationService.confirmUserEmailCode("unknown@example.com", code);
 
-        // Assert: Verificar que el resultado es false y no se removió ningún código
+        //Then
+        //Verificar que el resultado es false y no se removió ningún código
         assertFalse(result);
         verify(emailConfirmationCodes).remove("unknown@example.com", code);
     }

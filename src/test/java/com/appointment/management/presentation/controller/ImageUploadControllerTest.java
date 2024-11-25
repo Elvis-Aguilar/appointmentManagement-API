@@ -30,6 +30,8 @@ class ImageUploadControllerTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        //Given Global
         mockFile = new MockMultipartFile("file", "image.jpg", MediaType.IMAGE_JPEG_VALUE, "image content".getBytes());
     }
 

@@ -25,11 +25,12 @@ class DownloadExcelServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        //Sin Given Global
     }
 
     @Test
     void testGenerateExcelReport() throws IOException {
-        // Datos simulados para el reporte
+        // Given
         List<String> headers = List.of("ID", "Name", "Amount", "Date");
         List<Object> salesData = List.of(1, "Client A", 2500, LocalDate.now(), 2, "Client B", 1500, LocalDate.now());
         String nameReport = "SalesReport";
@@ -39,11 +40,11 @@ class DownloadExcelServiceTest {
         String range = "01-01-2024 - 01-31-2024";
         Integer size = salesData.size();
 
-        // Llamar al método a probar
+        // When
         ResponseEntity<byte[]> response = downloadExcelService.generateExcelReport(
                 headers, salesData, nameReport, businessConfig, title, filtro, range, size);
 
-        // Validaciones
+        // Then
         assertNotNull(response);
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(MediaType.APPLICATION_OCTET_STREAM, response.getHeaders().getContentType());

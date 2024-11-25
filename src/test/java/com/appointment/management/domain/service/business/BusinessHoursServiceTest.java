@@ -33,6 +33,7 @@ class BusinessHoursServiceTest {
     @InjectMocks
     private BusinessHoursService businessHoursService;
 
+    //Variables para el Given Global
     private BusinessHoursDto businessHoursDto;
     private BusinessHoursEntity businessHoursEntity;
 
@@ -40,6 +41,7 @@ class BusinessHoursServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
+        //Given Global
         businessHoursDto = new BusinessHoursDto(
                 1L,
                 1L,
@@ -53,23 +55,26 @@ class BusinessHoursServiceTest {
                 2
         );
 
+        //Given Global
         businessHoursEntity = new BusinessHoursEntity();
         businessHoursEntity.setId(1L);
         businessHoursEntity.setOpeningTime(LocalTime.of(9, 0));
         businessHoursEntity.setClosingTime(LocalTime.of(17, 0));
         businessHoursEntity.setAvailableWorkers(5);
         businessHoursEntity.setAvailableAreas(2);
-        // Configurar otros campos según sea necesario
     }
 
     @Test
     void testCreateBusinessHours() {
+        //When
         when(businessHoursMapper.toEntity(any(BusinessHoursDto.class))).thenReturn(businessHoursEntity);
         when(businessHoursRepository.save(any(BusinessHoursEntity.class))).thenReturn(businessHoursEntity);
         when(businessHoursMapper.toDto(any(BusinessHoursEntity.class))).thenReturn(businessHoursDto);
 
+        //Llamada a la funcion a testear
         BusinessHoursDto result = businessHoursService.save(businessHoursDto);
 
+        //Then
         assertNotNull(result);
         assertEquals(businessHoursDto.business(), result.business());
         verify(businessHoursRepository, times(1)).save(businessHoursEntity);
@@ -77,38 +82,51 @@ class BusinessHoursServiceTest {
 
     @Test
     public void testGetByIdThrowsExceptionIfNotFound() {
+        //Given
         Long id = 1L;
+
+        //When
         when(businessHoursRepository.findById(id)).thenReturn(Optional.empty());
 
         ValueNotFoundException exception = assertThrows(ValueNotFoundException.class, () -> {
             businessHoursService.getById(id);
         });
 
+        //Then
         assertEquals("BusinessHours not found with id: " + id, exception.getMessage());
     }
 
     @Test
     void shouldReturnBusinessConfigurationHoursWhenIdExists() {
+        //Given
         Long id = 1L;
 
+        //When
         when(businessHoursRepository.findById(id)).thenReturn(Optional.of(businessHoursEntity));
         when(businessHoursMapper.toDto(businessHoursEntity)).thenReturn(businessHoursDto);
 
+        //Llamando la funcion a testear
         BusinessHoursDto result = businessHoursService.getById(id);
 
+        //Then
         assertNotNull(result);
         assertEquals(businessHoursDto.id(), result.id());
     }
 
     @Test
     void testUpdateBusinessHours() {
+        //Given
         Long id = 1L;
+
+        //When
         when(businessHoursRepository.findById(id)).thenReturn(Optional.of(businessHoursEntity));
         when(businessHoursRepository.save(businessHoursEntity)).thenReturn(businessHoursEntity);
         when(businessHoursMapper.toDto(businessHoursEntity)).thenReturn(businessHoursDto);
 
+        //Llamando a la funcion a testear
         BusinessHoursDto updatedDto = businessHoursService.update(id, businessHoursDto);
 
+        //Then
         assertNotNull(updatedDto);
         verify(businessHoursRepository, times(1)).save(businessHoursEntity);
         verify(businessHoursMapper, times(1)).updateEntityFromDto(businessHoursDto, businessHoursEntity);
@@ -116,7 +134,10 @@ class BusinessHoursServiceTest {
 
     @Test
     void shouldThrowExceptionWhenUpdateBusinessHoursNotFount() {
+        //Given
         Long id = 1999L;
+
+        //When
         when(businessHoursRepository.findById(id)).thenReturn(Optional.empty());
 
         ValueNotFoundException thrown = assertThrows(
@@ -125,23 +146,32 @@ class BusinessHoursServiceTest {
                 "Expected findById() to throw, but it didn't"
         );
 
+        //Then
         assertTrue(thrown.getMessage().contains("BusinessHours not found with id: " + id));
 
     }
 
     @Test
     void testDeleteBusinessHours() {
+        //Given
         Long id = 1L;
+
+        //When
         when(businessHoursRepository.findById(id)).thenReturn(Optional.of(businessHoursEntity));
 
+        //Llamando a la funcion a testar
         businessHoursService.delete(id);
 
+        //Then
         verify(businessHoursRepository, times(1)).delete(businessHoursEntity);
     }
 
     @Test
     void shouldThrowExceptionWhenDeleteBusinessHoursNotFount() {
+        //Given
         Long id = 1999L;
+
+        //When
         when(businessHoursRepository.findById(id)).thenReturn(Optional.empty());
 
         ValueNotFoundException thrown = assertThrows(
@@ -150,17 +180,21 @@ class BusinessHoursServiceTest {
                 "Expected findById() to throw, but it didn't"
         );
 
+        //Then
         assertTrue(thrown.getMessage().contains("BusinessHours not found with id: " + id));
 
     }
 
     @Test
     void testGetAll() {
+        //When
         when(businessHoursRepository.findAll()).thenReturn(List.of(businessHoursEntity));
         when(businessHoursMapper.toDto(businessHoursEntity)).thenReturn(businessHoursDto);
 
+        //llamando a la funcion a testear
         List<BusinessHoursDto> result = businessHoursService.getAll();
 
+        //Then
         assertNotNull(result);
         assertEquals(1, result.size());
         verify(businessHoursRepository, times(1)).findAll();
@@ -168,11 +202,14 @@ class BusinessHoursServiceTest {
 
     @Test
     void testGetAllWithNullSpecificDateIs() {
+        //When
         when(businessHoursRepository.findBySpecificDateIsNull()).thenReturn(List.of(businessHoursEntity));
         when(businessHoursMapper.toDto(businessHoursEntity)).thenReturn(businessHoursDto);
 
+        //llamando a la funcion a testear
         List<BusinessHoursDto> result = businessHoursService.getAllWithNullSpecificDateIs();
 
+        //Then
         assertNotNull(result);
         assertEquals(1, result.size());
         verify(businessHoursRepository, times(1)).findBySpecificDateIsNull();
@@ -180,15 +217,19 @@ class BusinessHoursServiceTest {
 
     @Test
     void testGetBusinessHoursInDateRange() {
+        //Given
         LocalDate startDate = LocalDate.now().minusDays(1);
         LocalDate endDate = LocalDate.now().plusDays(1);
 
+        //When
         when(businessHoursRepository.findBySpecificDateBetween(startDate, endDate))
                 .thenReturn(List.of(businessHoursEntity));
         when(businessHoursMapper.toDto(businessHoursEntity)).thenReturn(businessHoursDto);
 
+        //Llamando a al funcion a testear
         List<BusinessHoursDto> result = businessHoursService.getBusinessHoursInDateRange(startDate, endDate);
 
+        //Then
         assertNotNull(result);
         assertEquals(1, result.size());
         verify(businessHoursRepository, times(1)).findBySpecificDateBetween(startDate, endDate);
@@ -196,22 +237,22 @@ class BusinessHoursServiceTest {
 
     @Test
     void shouldCreateAllBusinessHours() {
+        //Given
         List<BusinessHoursDto> dtoList = List.of(businessHoursDto);
         List<BusinessHoursEntity> entityList = List.of(businessHoursEntity);
 
+        //When
         when(businessHoursMapper.toEntity(any(BusinessHoursDto.class))).thenReturn(businessHoursEntity);
-
         when(businessHoursRepository.saveAll(anyList())).thenReturn(entityList);
-
         when(businessHoursMapper.toDto(any(BusinessHoursEntity.class))).thenReturn(businessHoursDto);
 
+        //Llamando a la funcio a testear
         List<BusinessHoursDto> result = businessHoursService.createAllList(dtoList);
 
+        //Then
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(businessHoursDto, result.getFirst());
-
-        // Verificar que los métodos del mapper y repositorio fueron llamados
         verify(businessHoursMapper, times(1)).toEntity(businessHoursDto);
         verify(businessHoursRepository, times(1)).saveAll(anyList());
         verify(businessHoursMapper, times(1)).toDto(businessHoursEntity);
@@ -219,13 +260,15 @@ class BusinessHoursServiceTest {
 
     @Test
     void shouldReturnEmptyListWhenInputIsEmpty() {
+        //Given
         List<BusinessHoursDto> emptyDtoList = List.of();
 
+        //When
         List<BusinessHoursDto> result = businessHoursService.createAllList(emptyDtoList);
 
+        //Then
         assertNotNull(result);
         assertTrue(result.isEmpty());
-
         verify(businessHoursMapper, never()).toEntity(any());
         verify(businessHoursRepository, never()).saveAll(anyList());
         verify(businessHoursMapper, never()).toDto(any());
@@ -233,7 +276,7 @@ class BusinessHoursServiceTest {
 
     @Test
     void shouldHandleMultipleBusinessHoursDtos() {
-        // Arrange
+        // Given
         BusinessHoursDto businessHoursDto2 = new BusinessHoursDto(
                 2L,
                 2L,
@@ -257,6 +300,7 @@ class BusinessHoursServiceTest {
         List<BusinessHoursDto> dtoList = List.of(businessHoursDto, businessHoursDto2);
         List<BusinessHoursEntity> entityList = List.of(businessHoursEntity, businessHoursEntity2);
 
+        //When
         when(businessHoursMapper.toEntity(any(BusinessHoursDto.class)))
                 .thenReturn(businessHoursEntity)
                 .thenReturn(businessHoursEntity2);
@@ -265,13 +309,14 @@ class BusinessHoursServiceTest {
                 .thenReturn(businessHoursDto)
                 .thenReturn(businessHoursDto2);
 
+        //Llamando a la funcion a testear
         List<BusinessHoursDto> result = businessHoursService.createAllList(dtoList);
 
+        //Then
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals(businessHoursDto, result.get(0));
         assertEquals(businessHoursDto2, result.get(1));
-
         verify(businessHoursMapper, times(2)).toEntity(any(BusinessHoursDto.class));
         verify(businessHoursRepository, times(1)).saveAll(anyList());
         verify(businessHoursMapper, times(2)).toDto(any(BusinessHoursEntity.class));
@@ -279,7 +324,7 @@ class BusinessHoursServiceTest {
 
     @Test
     void testGetAllWithNotNullSpecificDate() {
-        // Arrange
+        // Given
         BusinessHoursEntity businessHoursEntityWithSpecificDate = new BusinessHoursEntity();
         businessHoursEntityWithSpecificDate.setId(1L);
         businessHoursEntityWithSpecificDate.setOpeningTime(LocalTime.of(9, 0));
@@ -290,19 +335,17 @@ class BusinessHoursServiceTest {
 
         List<BusinessHoursEntity> entities = List.of(businessHoursEntityWithSpecificDate);
 
-        // Simular el comportamiento del repositorio y el mapper
+        // When
         when(businessHoursRepository.findBySpecificDateIsNotNull()).thenReturn(entities);
         when(businessHoursMapper.toDto(businessHoursEntityWithSpecificDate)).thenReturn(businessHoursDto);
 
-        // Act
+        // llamado de funcion a testear
         List<BusinessHoursDto> result = businessHoursService.getAllWithNotNullSpecificDate();
 
-        // Assert
+        // Then
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(businessHoursDto, result.get(0));
-
-        // Verificar que el método del repositorio fue llamado
         verify(businessHoursRepository, times(1)).findBySpecificDateIsNotNull();
         verify(businessHoursMapper, times(1)).toDto(businessHoursEntityWithSpecificDate);
     }

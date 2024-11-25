@@ -22,6 +22,7 @@ class RoleServiceTest {
     @InjectMocks
     private RoleService roleService;
 
+    //variables para el given global
     private RoleEntity roleEntity;
     private RoleDTO roleDTO;
 
@@ -29,6 +30,7 @@ class RoleServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
+        //Given global
         roleEntity = new RoleEntity("ADMIN", "Administrator Role");
         roleEntity.setId(1L);
 

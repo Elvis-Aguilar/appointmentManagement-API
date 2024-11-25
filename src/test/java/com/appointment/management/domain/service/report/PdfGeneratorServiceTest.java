@@ -24,17 +24,22 @@ class PdfGeneratorServiceTest {
     @Mock
     private ITextRenderer renderer;
 
+    //Variables para el Given Global
+    private String htmlContent;
+
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        //Given Global
+        htmlContent = "<html><body><h1>Sample PDF</h1></body></html>";
     }
 
     @Test
     void testGeneratePdfFromHtmlString_Success() throws IOException, DocumentException {
-        // Configurar el HTML de prueba
-        String htmlContent = "<html><body><h1>Sample PDF</h1></body></html>";
 
-        // Simular el comportamiento del renderer para no lanzar excepciones
+        // When
         doNothing().when(renderer).setDocumentFromString(htmlContent);
         doNothing().when(renderer).layout();
         doNothing().when(renderer).createPDF(any(ByteArrayOutputStream.class));
@@ -42,21 +47,20 @@ class PdfGeneratorServiceTest {
         // Llamar al método a probar
         byte[] pdfBytes = pdfGeneratorService.generatePdfFromHtmlString(htmlContent);
 
-        // Validar que el PDF generado no es nulo
+        // Then
         assertNotNull(pdfBytes);
 
     }
 
     @Test
     void testGeneratePdfFromHtmlString_ThrowsIOException() {
-        // Configurar el HTML de prueba
-        String htmlContent = "<html><body><h1>Sample PDF</h1></body></html>";
 
         try {
-            // Llamar al método y verificar la excepción
+            // When
             pdfGeneratorService.generatePdfFromHtmlString(htmlContent);
         } catch (IOException e) {
-            assertNotNull(e);  // Validar que la excepción no es nula
+            //Then
+            assertNotNull(e);
         }
     }
 }

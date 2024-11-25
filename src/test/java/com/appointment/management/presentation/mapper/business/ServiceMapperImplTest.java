@@ -24,14 +24,8 @@ class ServiceMapperImplTest {
     }
 
     @Test
-    void shouldReturnNullWhenDtoIsNullInToEntity() {
-        ServiceEntity result = serviceMapperImpl.toEntity(null);
-
-        assertNull(result);
-    }
-
-    @Test
     void shouldMapDtoToEntitySuccessfully() {
+        // Given
         ServiceDto dto = new ServiceDto(
                 1L,
                 "Test Service",
@@ -44,8 +38,10 @@ class ServiceMapperImplTest {
                 "AVAILABLE"
         );
 
+        // When
         ServiceEntity entity = serviceMapperImpl.toEntity(dto);
 
+        // Then
         assertNotNull(entity);
         assertEquals(dto.id(), entity.getId());
         assertEquals(dto.name(), entity.getName());
@@ -59,13 +55,16 @@ class ServiceMapperImplTest {
 
     @Test
     void shouldReturnNullWhenEntityIsNullInToDto() {
+        // When
         ServiceDto result = serviceMapperImpl.toDto(null);
 
+        // Then
         assertNull(result);
     }
 
     @Test
     void shouldMapEntityToDtoSuccessfully() {
+        // Given
         ServiceEntity entity = new ServiceEntity();
         entity.setId(1L);
         entity.setName("Test Service");
@@ -77,8 +76,11 @@ class ServiceMapperImplTest {
         entity.setImageUrl("http://test.com/image.jpg");
         entity.setStatus(StatusBusinessHours.AVAILABLE);
 
+        // When
         ServiceDto dto = serviceMapperImpl.toDto(entity);
 
+
+        // Then
         assertNotNull(dto);
         assertEquals(entity.getId(), dto.id());
         assertEquals(entity.getName(), dto.name());
@@ -93,12 +95,15 @@ class ServiceMapperImplTest {
 
     @Test
     void shouldDoNothingWhenDtoIsNullInUpdateEntityFromDto() {
+        // Given
         ServiceEntity entity = new ServiceEntity();
         entity.setName("Initial Name");
 
+        // When
         serviceMapperImpl.updateEntityFromDto(null, entity);
 
-        assertEquals("Initial Name", entity.getName());  // No debe cambiar el nombre
+        // Then
+        assertEquals("Initial Name", entity.getName());
     }
 
     @Test
@@ -150,5 +155,12 @@ class ServiceMapperImplTest {
         serviceMapperImpl.updateEntityFromDto(dto, entity);
 
         assertNull(entity.getStatus());  // El estatus debe quedar en null
+    }
+
+    @Test
+    void shouldReturnNullWhenDtoIsNullInToEntity() {
+        ServiceEntity result = serviceMapperImpl.toEntity(null);
+
+        assertNull(result);
     }
 }

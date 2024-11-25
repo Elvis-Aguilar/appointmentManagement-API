@@ -26,20 +26,21 @@ class TemplateRendererServiceTest {
     @InjectMocks
     private TemplateRendererService templateRendererService;
 
+    //variables globales para el Given global
     private String template;
     private Map<String, Object> variables;
     private String renderedContent;
 
     @BeforeEach
     void setUp() {
-        // given:
+        // Given global
         template = "testTemplate";
         variables = new HashMap<>();
         variables.put("key", "value");
 
         renderedContent = "Rendered content based on template and variables";
 
-        // Stub:
+        // When: Global
         when(templateEngine.process(eq(template), any(Context.class))).thenReturn(renderedContent);
     }
 

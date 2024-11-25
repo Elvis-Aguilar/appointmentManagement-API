@@ -29,6 +29,7 @@ class EmailServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        //Given: sin given global pues no comparten given...
     }
 
     @Test
@@ -57,22 +58,20 @@ class EmailServiceTest {
         String toEmail = "test@example.com";
         String subject = "Test HTML Subject";
         String htmlContent = "<h1>Test Body</h1>";
-        File attachment = new File("path/to/attachment.txt"); // Reemplaza con la ruta correcta
+        File attachment = new File("path/to/attachment.txt");
 
-        // Simula el mensaje MIME
         MimeMessage mimeMessage = mock(MimeMessage.class);
+
+        // When
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
 
-        // Cuando
         MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
-        messageHelper.setTo(toEmail);  // Cambiado de setRecipients a setTo
+        messageHelper.setTo(toEmail);
         messageHelper.setSubject(subject);
-        messageHelper.setText(htmlContent, true); // Cambiado a setText
-
-        // Llama al método sendHtmlEmail
-        emailService.sendHtmlEmail(companyName, toEmail, subject, htmlContent, attachment);
+        messageHelper.setText(htmlContent, true);
 
         // Then
+        emailService.sendHtmlEmail(companyName, toEmail, subject, htmlContent, attachment);
         verify(mailSender, times(1)).send(mimeMessage);
     }
 

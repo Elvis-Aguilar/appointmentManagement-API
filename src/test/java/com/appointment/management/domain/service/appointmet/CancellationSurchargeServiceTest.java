@@ -37,6 +37,7 @@ class CancellationSurchargeServiceTest {
 
     @BeforeEach
     void setUp() {
+        //Given
         cancellationSurchargeEntity = new CancellationSurchargeEntity();
         cancellationSurchargeEntity.setId(1L);
         cancellationSurchargeEntity.setAppointment(new AppointmentEntity());
@@ -96,9 +97,8 @@ class CancellationSurchargeServiceTest {
         anotherEntity.setDate(LocalDateTime.now());
         anotherEntity.setStatus(StatusCancellation.PENDING);
 
-        when(cancellationSurchargeRepository.findAll()).thenReturn(List.of(cancellationSurchargeEntity, anotherEntity));
-
         // When
+        when(cancellationSurchargeRepository.findAll()).thenReturn(List.of(cancellationSurchargeEntity, anotherEntity));
         List<CancellationSurchargeDto> result = cancellationSurchargeService.getAll();
 
         // Then

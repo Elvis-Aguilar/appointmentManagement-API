@@ -23,23 +23,28 @@ class TokenServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
+        //Given: sin Given Global, pues no es necesario, no comparten
     }
-
 
     @Test
     void testRecoverTokenWithBearerPrefix() {
+        //Given
         String token = "Bearer validToken";
+
+        //When
         when(request.getHeader("Authorization")).thenReturn(token);
 
+        //Then
         String recoveredToken = tokenService.recoverToken(request);
         assertEquals("validToken", recoveredToken);
     }
 
     @Test
     void testRecoverTokenWithoutBearerPrefix() {
+        //When
         when(request.getHeader("Authorization")).thenReturn(null);
 
+        //Then
         String recoveredToken = tokenService.recoverToken(request);
         assertNull(recoveredToken);
     }

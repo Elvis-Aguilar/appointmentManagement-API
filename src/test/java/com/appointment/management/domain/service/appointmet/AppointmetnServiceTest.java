@@ -2,11 +2,9 @@ package com.appointment.management.domain.service.appointmet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.appointment.management.application.exception.RequestConflictException;
 import com.appointment.management.domain.dto.appoinment.AppointmentDto;
 import com.appointment.management.domain.dto.business.BusinessConfigurationDto;
 import com.appointment.management.domain.dto.business.ServiceDto;
@@ -17,13 +15,11 @@ import com.appointment.management.domain.service.auth.TemplateRendererService;
 import com.appointment.management.domain.service.business.BusinessConfigurationService;
 import com.appointment.management.domain.service.business.ServiceService;
 import com.appointment.management.persistance.entity.AppointmentEntity;
-import com.appointment.management.persistance.entity.CancellationSurchargeEntity;
 import com.appointment.management.persistance.entity.ServiceEntity;
 import com.appointment.management.persistance.entity.UserEntity;
 import com.appointment.management.persistance.enums.StatusAppointment;
 import com.appointment.management.persistance.repository.AppointmentRepository;
 import com.appointment.management.presentation.mapper.business.AppointmentMapper;
-import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -61,10 +57,6 @@ class AppointmentServiceTest {
     @Mock
     private ServiceService serviceService;
 
-    @Mock
-    private CancellationSurchargeService cancellationSurchargeService;
-
-
     @InjectMocks
     private AppointmetnService appointmentService;
 
@@ -73,6 +65,7 @@ class AppointmentServiceTest {
 
     @BeforeEach
     void setUp() {
+        //Given
         MockitoAnnotations.openMocks(this);
         customer = new UserEntity();
         customer.setId(1L);
@@ -128,12 +121,11 @@ class AppointmentServiceTest {
         AppointmentEntity appointmentEntity = new AppointmentEntity();
         AppointmentEntity savedEntity = new AppointmentEntity();
 
+        // When
         when(appointmentMapper.toEntity(appointmentDto)).thenReturn(appointmentEntity);
         when(appointmentRepository.existsByEmployeeIdAndDateRange(any(), any(), any())).thenReturn(false);
         when(appointmentRepository.save(appointmentEntity)).thenReturn(savedEntity);
         when(appointmentMapper.toDto(savedEntity)).thenReturn(appointmentDto);
-
-        // When
         AppointmentDto result = appointmentService.createAppointment(appointmentDto);
 
         // Then
@@ -149,17 +141,15 @@ class AppointmentServiceTest {
         // Given
         Long appointmentId = 1L;
         AppointmentDto appointmentDto = new AppointmentDto(1L, 2L, 2L, 3L, LocalDateTime.now(), LocalDateTime.now(), "ffd", "fasdfas", false);
-        AppointmentEntity existingAppointment = new AppointmentEntity(); // Asegúrate de inicializar la entidad según sea necesario
+        AppointmentEntity existingAppointment = new AppointmentEntity();
 
+        // When
         when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(existingAppointment));
-
-        // Aquí no necesitas el return ya que el método es void
         doNothing().when(appointmentMapper).updateEntityFromDto(appointmentDto, existingAppointment);
-
         when(appointmentRepository.save(existingAppointment)).thenReturn(existingAppointment);
         when(appointmentMapper.toDto(existingAppointment)).thenReturn(appointmentDto);
 
-        // When
+        //uso del metodo
         AppointmentDto result = appointmentService.updateAppointment(appointmentId, appointmentDto);
 
         // Then
@@ -174,9 +164,8 @@ class AppointmentServiceTest {
         // Given
         Long appointmentId = 1L;
 
-        when(appointmentRepository.existsById(appointmentId)).thenReturn(true);
-
         // When
+        when(appointmentRepository.existsById(appointmentId)).thenReturn(true);
         assertDoesNotThrow(() -> appointmentService.deleteAppointment(appointmentId));
 
         // Then
@@ -188,10 +177,11 @@ class AppointmentServiceTest {
         // Given
         Long appointmentId = 1L;
 
+        // When
         when(appointmentRepository.existsById(appointmentId)).thenReturn(false);
-
-        // When & Then
         assertThrows(IllegalArgumentException.class, () -> appointmentService.deleteAppointment(appointmentId));
+
+        //Then
         verify(appointmentRepository).existsById(appointmentId);
     }
 
@@ -211,7 +201,7 @@ class AppointmentServiceTest {
 
         BusinessConfigurationDto businessConfigDto = new BusinessConfigurationDto("Test Company", "http://logo.url");
 
-        // Simulaciones de retorno
+        // When
         when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(existingAppointment));
         when(appointmentRepository.save(existingAppointment)).thenReturn(existingAppointment);
         when(businessConfigurationService.findFirst()).thenReturn(businessConfigDto);
@@ -219,10 +209,8 @@ class AppointmentServiceTest {
         when(serviceService.getServiceById(existingAppointment.getService().getId())).thenReturn(serviceDto);
         when(templateRendererService.renderTemplate(anyString(), anyMap())).thenReturn("<html>...</html>"); // Simulando la plantilla HTML
 
-        // When
-        AppointmentDto result = appointmentService.completedAppointment(appointmentId);
-
         // Then
+        AppointmentDto result = appointmentService.completedAppointment(appointmentId);
     }
 
     @Test
@@ -230,10 +218,10 @@ class AppointmentServiceTest {
         // Given
         Long appointmentId = 1L;
 
-        // Simulación de la excepción
+        // When
         when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.empty());
 
-        // When / Then
+        // Then
         assertThrows(IllegalArgumentException.class, () -> appointmentService.completedAppointment(appointmentId));
         verify(appointmentRepository).findById(appointmentId);
     }
@@ -257,7 +245,7 @@ class AppointmentServiceTest {
 
         BusinessConfigurationDto businessConfigDto = new BusinessConfigurationDto("Test Company", "http://logo.url");
 
-        // Simulaciones de retorno
+        // When
         when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(existingAppointment));
         when(appointmentRepository.save(existingAppointment)).thenReturn(existingAppointment);
         when(userService.findUserByIdEntity(existingAppointment.getCustomer().getId())).thenReturn(userEntity);
@@ -266,7 +254,6 @@ class AppointmentServiceTest {
         when(serviceService.getServiceById(existingAppointment.getService().getId())).thenReturn(serviceDto);
         when(templateRendererService.renderTemplate(anyString(), anyMap())).thenReturn("<html>...</html>"); // Simulando la plantilla HTML
 
-        // When
 
         // Then
         assertEquals(StatusAppointment.CANCELED, existingAppointment.getStatus()); // Verificar el estado
@@ -277,21 +264,22 @@ class AppointmentServiceTest {
         // Given
         Long appointmentId = 1L;
 
-        // Simulación de la excepción
+        // When
         when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.empty());
 
-        // When / Then
+         // Then
         assertThrows(IllegalArgumentException.class, () -> appointmentService.canceledAppointment(appointmentId));
         verify(appointmentRepository).findById(appointmentId);
     }
 
     @Test
     public void testStateCancelAppointment_Success() {
+        //When
         when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointmentEntity));
         when(appointmentRepository.save(any(AppointmentEntity.class))).thenReturn(appointmentEntity);
 
+        //Then
         AppointmentDto result = appointmentService.stateCancelAppointment(1L);
-
         verify(appointmentRepository).save(appointmentEntity);
     }
 
@@ -306,9 +294,9 @@ class AppointmentServiceTest {
         assertEquals("Appointment not found", exception.getMessage());
     }
 
-
     @Test
     public void testCanceledAppointment_Success() throws Exception {
+        //when
         when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointmentEntity));
         when(appointmentRepository.save(any(AppointmentEntity.class))).thenReturn(appointmentEntity);
         when(userService.findUserByIdEntity(1L)).thenReturn(customer);
@@ -320,8 +308,10 @@ class AppointmentServiceTest {
 
     @Test
     public void testCanceledAppointment_AppointmentNotFound() {
+        //When
         when(appointmentRepository.findById(1L)).thenReturn(Optional.empty());
 
+        //Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             appointmentService.canceledAppointment(1L);
         });
@@ -331,12 +321,15 @@ class AppointmentServiceTest {
 
     @Test
     public void testCanceledAppointment_EmailSendingFailure() throws Exception {
+        //When
         when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointmentEntity));
         when(appointmentRepository.save(any(AppointmentEntity.class))).thenReturn(appointmentEntity);
         when(userService.findUserByIdEntity(1L)).thenReturn(customer);
         when(businessConfigurationService.findFirst()).thenReturn(new BusinessConfigurationDto("fadfds","sgfgs"));
         when(serviceService.getServiceById(any())).thenReturn(new ServiceDto(1L, "sgfg",new BigDecimal("5"),LocalTime.now(),"afdfdsf", 5,"sgdf","sgfg","sgfg"));
         when(templateRendererService.renderTemplate(any(), any())).thenReturn("HTML Content");
+
+        //Then
         doThrow(new MailException("Email error") {}).when(emailService).sendHtmlEmail(anyString(), anyString(), anyString(), anyString());
 
 

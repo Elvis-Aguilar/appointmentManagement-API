@@ -34,10 +34,12 @@ class BusinessConfigurationMapperImplTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
+        //Given Global
         admin = new UserEntity();
         admin.setId(1L);
         admin.setName("Admin User");
 
+        //Given Global
         dto = new BusinessConfigurationDto(
                 1L,
                 "Business Name",
@@ -54,6 +56,7 @@ class BusinessConfigurationMapperImplTest {
                 false
         );
 
+        //Given Global
         entity = new BusinessConfigurationEntity();
         entity.setId(1L);
         entity.setAdmin(admin);
@@ -71,10 +74,14 @@ class BusinessConfigurationMapperImplTest {
 
     @Test
     void shouldConvertDtoToEntityWhenDtoIsValid() {
+
+        // When
         when(userMapperHelper.findById(1L)).thenReturn(admin);
 
+        // Ejecucion del metodo a testear
         BusinessConfigurationEntity result = businessConfigurationMapperImpl.toEntity(dto);
 
+        // Then
         assertNotNull(result);
         assertEquals(1L, result.getId());
         assertEquals(admin, result.getAdmin());
@@ -92,12 +99,16 @@ class BusinessConfigurationMapperImplTest {
 
     @Test
     void shouldThrowBadRequestExceptionWhenAdminNotFound() {
+
+        // When
         when(userMapperHelper.findById(1L)).thenReturn(null);
 
+        // Ejecucion del metodo a testear
         BadRequestException exception = assertThrows(BadRequestException.class, () -> {
             businessConfigurationMapperImpl.toEntity(dto);
         });
 
+        // Then
         assertEquals("Admin not found with id: 1", exception.getMessage());
 
         verify(userMapperHelper, times(1)).findById(1L);
@@ -105,6 +116,8 @@ class BusinessConfigurationMapperImplTest {
 
     @Test
     void shouldThrowBadRequestExceptionWhenBusinessTypeIsInvalid() {
+
+        // Given
         BusinessConfigurationDto invalidDto = new BusinessConfigurationDto(
                 1L,
                 "Business Name",
@@ -120,21 +133,27 @@ class BusinessConfigurationMapperImplTest {
                 BigDecimal.valueOf(15.00),
                 false
         );
+
+        // When
         when(userMapperHelper.findById(1L)).thenReturn(admin);
 
+        // Ejecucion del metodo a testear
         BadRequestException exception = assertThrows(BadRequestException.class, () -> {
             businessConfigurationMapperImpl.toEntity(invalidDto);
         });
 
+        // Then
         assertEquals("Invalid business type: INVALID_TYPE", exception.getMessage());
-
         verify(userMapperHelper, times(1)).findById(1L);
     }
 
     @Test
     void shouldReturnNullWhenDtoIsNull() {
+
+        // When
         BusinessConfigurationEntity result = businessConfigurationMapperImpl.toEntity(null);
 
+        // Then
         assertNull(result);
 
         verify(userMapperHelper, times(0)).findById(anyLong());
@@ -142,10 +161,14 @@ class BusinessConfigurationMapperImplTest {
 
     @Test
     void shouldConvertEntityToDtoWhenEntityIsValid() {
+
+        // When
         when(userMapperHelper.toId(admin)).thenReturn(1L);
 
+        // Ejecucion del metodo a testear
         BusinessConfigurationDto result = businessConfigurationMapperImpl.toDto(entity);
 
+        // Then
         assertNotNull(result);
         assertEquals(1L, result.id());
         assertEquals(1L, result.admin());
@@ -165,10 +188,11 @@ class BusinessConfigurationMapperImplTest {
 
     @Test
     void shouldReturnNullWhenEntityIsNull() {
+         // When
         BusinessConfigurationDto result = businessConfigurationMapperImpl.toDto(null);
 
+        // Then
         assertNull(result);
-
         verify(userMapperHelper, times(0)).toId(any(UserEntity.class));
     }
 

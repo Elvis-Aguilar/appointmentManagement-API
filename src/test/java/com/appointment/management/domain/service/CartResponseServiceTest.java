@@ -9,19 +9,25 @@ import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CartResponseServiceTest {
+
     private CartResponseService cartResponseService;
+
+    //Variables globales para el given global
+    private String dataValue;
+    private String messageValue;
+    private HttpStatus status;
 
     @BeforeEach
     void setUp() {
         cartResponseService = new CartResponseService();
+        //Given Global
+        dataValue = "Sample data";
+        messageValue = "Operation successful";
+        status = HttpStatus.OK;
     }
 
     @Test
     void givenDataAndMessage_whenResponseSuccess_thenReturnValidResponseEntity() {
-        // Given
-        String dataValue = "Sample data";
-        String messageValue = "Operation successful";
-        HttpStatus status = HttpStatus.OK;
 
         // When
         ResponseEntity<Object> response = cartResponseService.responseSuccess(dataValue, messageValue, status);
@@ -41,7 +47,7 @@ class CartResponseServiceTest {
     void givenMessage_whenResponseError_thenReturnValidResponseEntity() {
         // Given
         String messageValue = "Operation failed";
-        HttpStatus status = HttpStatus.BAD_REQUEST;
+        status = HttpStatus.BAD_REQUEST;
 
         // When
         ResponseEntity<Object> response = cartResponseService.responseError(messageValue, status);

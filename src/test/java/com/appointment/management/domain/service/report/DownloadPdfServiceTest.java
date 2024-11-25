@@ -32,57 +32,58 @@ class DownloadPdfServiceTest {
     @Mock
     private PdfGeneratorService pdfGeneratorService;
 
+    //Variables globales para el Given global
+    private String templateName;
+    private Map<String, Object> templateVariables;
+    private String renderedHtml;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        //Given Global
+        templateName = "report-template";
+        templateVariables = Map.of("key", "value");
+        renderedHtml = "<html><body><h1>Test Report</h1></body></html>";
+
     }
 
     @Test
     void testDownloadPdf_Success() throws IOException {
-        // Configurar los datos de prueba
-        String templateName = "report-template";
-        Map<String, Object> templateVariables = Map.of("key", "value");
-        String renderedHtml = "<html><body><h1>Test Report</h1></body></html>";
+        // Given
         byte[] pdfBytes = new byte[]{1, 2, 3};
 
-        // Configurar el comportamiento simulado de las dependencias
+        //  When
         when(templateRendererService.renderTemplate(templateName, templateVariables)).thenReturn(renderedHtml);
         when(pdfGeneratorService.generatePdfFromHtmlString(renderedHtml)).thenReturn(pdfBytes);
 
-        // Llamar al método a probar
+        // Llamar al método a Testear
         ResponseEntity<Resource> response = downloadPdfService.downloadPdf(templateName, templateVariables);
 
-        // Validaciones
+        // Then
         assertNotNull(response);
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(MediaType.APPLICATION_PDF, response.getHeaders().getContentType());
         assertEquals("attachment; filename=\"pdf-test.pdf\"", response.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION));
         assertNotNull(response.getBody());
 
-        // Verificar las interacciones con las dependencias
         verify(templateRendererService).renderTemplate(templateName, templateVariables);
         verify(pdfGeneratorService).generatePdfFromHtmlString(renderedHtml);
     }
 
     @Test
     void testDownloadPdf_Failure() throws IOException {
-        // Configurar los datos de prueba
-        String templateName = "report-template";
-        Map<String, Object> templateVariables = Map.of("key", "value");
-        String renderedHtml = "<html><body><h1>Test Report</h1></body></html>";
 
-        // Configurar el comportamiento simulado de las dependencias para lanzar una excepción
+        // When
         when(templateRendererService.renderTemplate(templateName, templateVariables)).thenReturn(renderedHtml);
         when(pdfGeneratorService.generatePdfFromHtmlString(renderedHtml)).thenThrow(new IOException("PDF generation error"));
 
         // Llamar al método a probar
         ResponseEntity<Resource> response = downloadPdfService.downloadPdf(templateName, templateVariables);
 
-        // Validaciones
+        // Then
         assertNotNull(response);
         assertEquals(400, response.getStatusCodeValue());
 
-        // Verificar las interacciones con las dependencias
         verify(templateRendererService).renderTemplate(templateName, templateVariables);
         verify(pdfGeneratorService).generatePdfFromHtmlString(renderedHtml);
     }

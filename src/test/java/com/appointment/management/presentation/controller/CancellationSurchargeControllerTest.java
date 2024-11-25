@@ -40,14 +40,6 @@ class CancellationSurchargeControllerTest {
     @Mock
     private CancellationSurchargeService cancellationSurchargeService;
 
-    @Mock
-    private DownloadPdfService downloadPdfService;
-
-    @Mock
-    private BusinessConfigurationService businessConfigurationService;
-
-    @Mock
-    private DownloadExcelService downloadExcelService;
 
     @BeforeEach
     void setUp() {
@@ -56,15 +48,19 @@ class CancellationSurchargeControllerTest {
 
     @Test
     void testFindAll() {
+        //Given
         List<CancellationSurchargeDto> mockList = List.of(
                 new CancellationSurchargeDto(1L, 101L, LocalDate.now().atStartOfDay(), 201L, StatusCancellation.PENDING),
                 new CancellationSurchargeDto(2L, 102L, LocalDate.now().atStartOfDay(), 202L, StatusCancellation.PENDING)
         );
 
+        //When
         when(cancellationSurchargeService.getAll()).thenReturn(mockList);
 
+        //Ejecutando el metodo del controlador a testear
         ResponseEntity<List<CancellationSurchargeDto>> response = controller.findAll();
 
+        //Then
         assertNotNull(response);
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(mockList, response.getBody());

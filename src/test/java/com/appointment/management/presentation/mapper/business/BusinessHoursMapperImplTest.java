@@ -28,6 +28,7 @@ class BusinessHoursMapperImplTest {
     @InjectMocks
     private BusinessHoursMapperImpl businessHoursMapperImpl;
 
+    //variables globales para el Given Global
     private BusinessHoursDto businessHoursDto;
     private BusinessConfigurationEntity businessConfigurationEntity;
 
@@ -35,6 +36,7 @@ class BusinessHoursMapperImplTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
+        //Given Global
         businessConfigurationEntity = new BusinessConfigurationEntity();
         businessConfigurationEntity.setId(1L);
 
@@ -54,10 +56,13 @@ class BusinessHoursMapperImplTest {
 
     @Test
     void shouldConvertDtoToEntityWhenDtoIsValid() {
+        // When
         when(businessConfigurationMapperHelper.findById(1L)).thenReturn(businessConfigurationEntity);
 
+        // Ejecucion del metodo a testear
         BusinessHoursEntity result = businessHoursMapperImpl.toEntity(businessHoursDto);
 
+        // Then
         assertNotNull(result);
         assertEquals(1L, result.getId());
         assertEquals(businessConfigurationEntity, result.getBusiness());
@@ -73,16 +78,21 @@ class BusinessHoursMapperImplTest {
 
     @Test
     void shouldThrowExceptionWhenBusinessNotFound() {
+        // When
         when(businessConfigurationMapperHelper.findById(1L)).thenReturn(null);
 
+        // Ejecucion del metodo a testear
         BadRequestException exception = assertThrows(BadRequestException.class, () -> {
             businessHoursMapperImpl.toEntity(businessHoursDto);
         });
+
+        //Then
         assertEquals("Business Configuration not found with id: 1", exception.getMessage());
     }
 
     @Test
     void shouldThrowExceptionWhenStatusIsInvalid() {
+        //Given
         when(businessConfigurationMapperHelper.findById(1L)).thenReturn(new BusinessConfigurationEntity());
 
         BusinessHoursDto invalidStatusDto = new BusinessHoursDto(
@@ -98,14 +108,18 @@ class BusinessHoursMapperImplTest {
                 3
         );
 
+        // When
         BadRequestException exception = assertThrows(BadRequestException.class, () -> {
             businessHoursMapperImpl.toEntity(invalidStatusDto);
         });
+
+        // Then
         assertEquals("Invalid business Hours type: INVALID_STATUS", exception.getMessage());
     }
 
     @Test
     void shouldConvertEntityToDtoWhenEntityIsValid() {
+        // Given
         BusinessHoursEntity entity = new BusinessHoursEntity();
         entity.setId(1L);
         entity.setBusiness(businessConfigurationEntity);
@@ -118,10 +132,13 @@ class BusinessHoursMapperImplTest {
         entity.setAvailableAreas(3);
         entity.setCreatedAt(LocalDateTime.now());
 
+        //When
         when(businessConfigurationMapperHelper.toId(businessConfigurationEntity)).thenReturn(1L);
 
+        // Ejecucion del metodo a testear
         BusinessHoursDto result = businessHoursMapperImpl.toDto(entity);
 
+        //Then
         assertNotNull(result);
         assertEquals(1L, result.id());
         assertEquals(1L, result.business());
