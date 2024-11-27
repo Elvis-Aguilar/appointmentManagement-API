@@ -22,10 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -89,6 +86,11 @@ public class AppointmetnService {
 
         // Si no hay conflicto, procedemos a crear la cita
         AppointmentEntity entity = appointmentMapper.toEntity(appointmentDto);
+        //agrega la multa
+        Optional<AppointmentEntity> latestAppointment = appointmentRepository.findFirstByCustomerIdOrderByIdDesc(entity.getCustomer().getId());
+        if (latestAppointment.isPresent() && latestAppointment.get().isFine()) {
+            entity.setFine(true);
+        }
         AppointmentEntity savedEntity = appointmentRepository.save(entity);
         return appointmentMapper.toDto(savedEntity);
     }

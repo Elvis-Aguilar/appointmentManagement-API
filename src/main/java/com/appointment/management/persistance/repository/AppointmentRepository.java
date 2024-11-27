@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface AppointmentRepository extends JpaRepository<AppointmentEntity, Long> {
     @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END " +
@@ -18,5 +19,7 @@ public interface AppointmentRepository extends JpaRepository<AppointmentEntity, 
                                            @Param("endDate") LocalDateTime endDate);
 
     List<AppointmentEntity> findByEmployeeId(Long employeeId);
+
+    Optional<AppointmentEntity> findFirstByCustomerIdOrderByIdDesc(Long customerId);
 
 }

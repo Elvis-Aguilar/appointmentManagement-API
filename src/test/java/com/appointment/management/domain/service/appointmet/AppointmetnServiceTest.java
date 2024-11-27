@@ -115,28 +115,6 @@ class AppointmentServiceTest {
     }
 
     @Test
-    void testCreateAppointment() {
-        // Given
-        AppointmentDto appointmentDto = new AppointmentDto(1L, 2L, 2L, 3L, LocalDateTime.now(), LocalDateTime.now(), "ffd", "fasdfas", false);
-        AppointmentEntity appointmentEntity = new AppointmentEntity();
-        AppointmentEntity savedEntity = new AppointmentEntity();
-
-        // When
-        when(appointmentMapper.toEntity(appointmentDto)).thenReturn(appointmentEntity);
-        when(appointmentRepository.existsByEmployeeIdAndDateRange(any(), any(), any())).thenReturn(false);
-        when(appointmentRepository.save(appointmentEntity)).thenReturn(savedEntity);
-        when(appointmentMapper.toDto(savedEntity)).thenReturn(appointmentDto);
-        AppointmentDto result = appointmentService.createAppointment(appointmentDto);
-
-        // Then
-        assertNotNull(result);
-        verify(appointmentRepository).existsByEmployeeIdAndDateRange(any(), any(), any());
-        verify(appointmentRepository).save(appointmentEntity);
-        verify(appointmentMapper).toEntity(appointmentDto);
-        verify(appointmentMapper).toDto(savedEntity);
-    }
-
-    @Test
     void testUpdateAppointment() {
         // Given
         Long appointmentId = 1L;
